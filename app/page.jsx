@@ -944,3 +944,139 @@ function AdminPanel({ appointments, blocked, onCancelAppt, onUpdateAppt, onBlock
     </div>
   );
 }
+// ============================================================
+// MAIN APP
+// ============================================================
+export default function App() {
+  const [appointments, setAppointments] = useState([]);
+  const [blocked, setBlocked] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [route, setRoute] = useState("home");
+  const [adminAuthed, setAdminAuthed] = useState(false);
+  const [toast, setToast] = useState(null);
+  const [cancelId, setCancelId] = useState(null);
+
+  const [adminPassword, setAdminPassword] = useState(() => {
+    try { return localStorage.getItem("admin_pwd") || DEFAULT_ADMIN_PASSWORD; } catch { return DEFAULT_ADMIN_PASSWORD; }
+  });
+  const handlePasswordChange = (p) => {
+    setAdminPassword(p);
+    try { localStorage.setItem("admin_pwd", p); } catch {}
+  };
+
+  const [bizConfig, setBizConfig] = useState(() => {
+    try {
+      const s = localStorage.getItem("biz_config");
+      return s ? JSON.parse(s) : { name: BUSINESS_NAME, address: "", phone: "", schedule: "Lunes a Sábado · 09:30 – 21:30", cancelPolicy: "Cancelación gratuita con 24h de antelación" };
+    } catch { return { name: BUSINESS_NAME, address: "", phone: "", schedule: "Lunes a Sábado · 09:30 – 21:30", cancelPolicy: "Cancelación gratuita con 24h de antelación" }; }
+  });
+  const handleBizConfig = (c) => {
+    setBizConfig(c);
+    try { localStorage.setItem("biz_config", JSON.stringify(c)); } catch {}
+  };
+
+  useEffect(() => {
+    const el = document.createElement("style");
+    el.textContent = GLOBAL_CSS;
+    document.head.appendChild(el);
+    return () => document.head.removeChild(el);
+  }, []);
+
+  useEffect(() => { loadData(); }, []);
+
+  async function loadData() {
+    setLoading(true);
+    const [{ data: appts }, { data: blk }] = await Promise.all([
+      supabase.from("appointments").select("*").order("date").order("time"),
+      supabase.from("blocked_slots").select("*")
+    ]);
+    setAppointments(appts || []);
+    setBlocked((blk || []).map(b => ({ ...b, time: b.time ? b.time.slice(0,5) : b.time })));
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    const channel = supabase.channel("realtime-appointments")
+      .on("postgres_changes", { event: "*", schema: "public", table: "appointments" }, () => loadData())
+      .on("postgres_changes", { event: "*", schema: "public", table: "blocked_slots" }, () => loadData())
+      .subscribe();
+    return () => supabase.removeChannel(channel);
+  }, []);
+
+  const showToast = useCallback(msg => setToast(msg), []);
+
+  const handleBook = async (apptData) => {
+    const { data, error } = await supabase.from("appointments").insert(apptData).select().single();
+    if (error) throw error;
+    setAppointments(prev => [...prev, data]);
+    return data;
+  };
+
+  const handleCancel = async (id) => {
+    await supabase.from("appointments").update({ status: "cancelled" }).eq("id", id);
+    setAppointments(prev => prev.map(a => a.id === id ? { ...a, status: "cancelled" } : a));
+  };
+
+  const handleUpdate = async (updated) => {
+    await supabase.from("appointments").update({ date: updated.date, time: updated.time, notes: updated.notes }).eq("id", updated.id);
+    setAppointments(prev => prev.map(a => a.id === updated.id ? { ...a, ...updated } : a));
+  };
+
+  const handleBlock = async (date, time) => {
+    await supabase.from("blocked_slots").insert({ date, time }).onConflict("date,time").ignore();
+    setBlocked(prev => [...prev, { date, time }]);
+  };
+
+  const handleUnblock = async (date, time) => {
+    await supabase.from("blocked_slots").delete().eq("date", date).eq("time", time);
+    setBlocked(prev => prev.filter(b => !(b.date === date && b.time === time)));
+  };
+
+  const handleBlockDay = async (date) => {
+    const rows = ALL_SLOTS.map(t => ({ date, time: t }));
+    await supabase.from("blocked_slots").upsert(rows, { onConflict: "date,time" });
+    setBlocked(prev => {
+      const filtered = prev.filter(b => b.date !== date);
+      return [...filtered, ...ALL_SLOTS.map(t => ({ date, time: t }))];
+    });
+  };
+
+  const isAdmin = route === "admin";
+  const isCancel = route.startsWith("cancel/");
+
+  if (loading) return (
+    <div className="app-container">
+      <div className="app-header">
+        <div style={{display:"flex",alignItems:"center",gap:10}}>
+          <div style={{color:"var(--gold)"}}><Icon.scissors /></div>
+          <div><h1 className="serif">{bizConfig?.name || BUSINESS_NAME}</h1><p>Reserva tu cita · Online</p></div>
+        </div>
+      </div>
+      <div className="loading-screen"><div className="spinner"/><p>Cargando...</p></div>
+    </div>
+  );
+
+  return (
+    <div className="app-container">
+      <div className="app-header">
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+          <div style={{display:"flex",alignItems:"center",gap:10}}>
+            <div style={{color:"var(--gold)"}}><Icon.scissors /></div>
+            <div><h1 className="serif">{bizConfig?.name || BUSINESS_NAME}</h1><p>Reserva tu cita · Online</p></div>
+          </div>
+          <div style={{display:"flex",gap:8}}>
+            {!isAdmin&&!isCancel&&<button style={{background:"none",border:"1px solid #333",color:"#888",borderRadius:8,padding:"6px 10px",fontSize:"0.7rem",cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}} onClick={()=>setRoute("admin")}>Admin</button>}
+            {(isAdmin||isCancel)&&<button style={{background:"none",border:"1px solid #333",color:"#888",borderRadius:8,padding:"6px 10px",fontSize:"0.7rem",cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}} onClick={()=>{setRoute("home");setAdminAuthed(false);}}>← Inicio</button>}
+          </div>
+        </div>
+      </div>
+      <div>
+        {route==="home"&&<BookingApp appointments={appointments} blocked={blocked} onBook={handleBook} showToast={showToast} bizConfig={bizConfig} />}
+        {route==="admin"&&!adminAuthed&&<AdminLogin onLogin={()=>setAdminAuthed(true)} adminPassword={adminPassword} onPasswordChange={handlePasswordChange} />}
+        {route==="admin"&&adminAuthed&&<AdminPanel appointments={appointments} blocked={blocked} onCancelAppt={handleCancel} onUpdateAppt={handleUpdate} onBlock={handleBlock} onUnblock={handleUnblock} onBlockDay={handleBlockDay} onLogout={()=>{setAdminAuthed(false);setRoute("home");}} showToast={showToast} adminPassword={adminPassword} onPasswordChange={handlePasswordChange} bizConfig={bizConfig} onBizConfig={handleBizConfig} />}
+        {isCancel&&<CancelPage appointmentId={cancelId} onCancel={handleCancel} />}
+      </div>
+      {toast&&<Toast message={toast} onDone={()=>setToast(null)} />}
+    </div>
+  );
+}
