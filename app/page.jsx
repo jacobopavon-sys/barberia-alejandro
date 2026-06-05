@@ -776,12 +776,12 @@ function SettingsTab({ adminPassword, onPasswordChange, showToast }) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
-  const handleChange = () => {
+  const handleChange = async () => {
     setError("");
     if (currentPwd !== adminPassword) { setError("La contraseña actual no es correcta."); return; }
     if (newPwd.length < 6) { setError("Mínimo 6 caracteres."); return; }
     if (newPwd !== confirmPwd) { setError("Las contraseñas no coinciden."); return; }
-    onPasswordChange(newPwd);
+    await onPasswordChange(newPwd);
     setCurrentPwd(""); setNewPwd(""); setConfirmPwd("");
     setSuccess(true); showToast("🔐 Contraseña actualizada");
     setTimeout(() => setSuccess(false), 4000);
