@@ -825,7 +825,7 @@ function SettingsTab({ adminPassword, onPasswordChange, showToast }) {
 // ============================================================
 // ADMIN PANEL
 // ============================================================
-function AdminPanel({ appointments, blocked, onCancelAppt, onUpdateAppt, onBlock, onUnblock, onBlockDay, onLogout, showToast, adminPassword, onPasswordChange, bizConfig, onBizConfig, capacidad, setCapacidad }) {dminPassword, onPasswordChange, bizConfig, onBizConfig, capacidad }) {
+function AdminPanel({ appointments, blocked, onCancelAppt, onUpdateAppt, onBlock, onUnblock, onBlockDay, onLogout, showToast, adminPassword, onPasswordChange, bizConfig, onBizConfig, capacidad, setCapacidad }) {
   const [tab, setTab] = useState("agenda");
   const [selectedDate, setSelectedDate] = useState(todayStr());
   const [editModal, setEditModal] = useState(null);
