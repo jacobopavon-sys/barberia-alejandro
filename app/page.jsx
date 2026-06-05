@@ -956,23 +956,27 @@ export default function App() {
   const [toast, setToast] = useState(null);
   const [cancelId, setCancelId] = useState(null);
 
-  const [adminPassword, setAdminPassword] = useState(() => {
-    try { return localStorage.getItem("admin_pwd") || DEFAULT_ADMIN_PASSWORD; } catch { return DEFAULT_ADMIN_PASSWORD; }
+const [adminPassword, setAdminPassword] = useState(DEFAULT_ADMIN_PASSWORD);
+  const [bizConfig, setBizConfig] = useState({
+    name: BUSINESS_NAME, address: "", phone: "",
+    schedule: "Lunes a Sábado · 09:30 – 21:30",
+    cancelPolicy: "Cancelación gratuita con 24h de antelación"
   });
-  const handlePasswordChange = (p) => {
+
+  const handlePasswordChange = async (p) => {
+    await supabase.from("settings").update({ value: p }).eq("key", "admin_password");
     setAdminPassword(p);
-    try { localStorage.setItem("admin_pwd", p); } catch {}
   };
 
-  const [bizConfig, setBizConfig] = useState(() => {
-    try {
-      const s = localStorage.getItem("biz_config");
-      return s ? JSON.parse(s) : { name: BUSINESS_NAME, address: "", phone: "", schedule: "Lunes a Sábado · 09:30 – 21:30", cancelPolicy: "Cancelación gratuita con 24h de antelación" };
-    } catch { return { name: BUSINESS_NAME, address: "", phone: "", schedule: "Lunes a Sábado · 09:30 – 21:30", cancelPolicy: "Cancelación gratuita con 24h de antelación" }; }
-  });
-  const handleBizConfig = (c) => {
+  const handleBizConfig = async (c) => {
+    await Promise.all([
+      supabase.from("settings").update({ value: c.name }).eq("key", "biz_name"),
+      supabase.from("settings").update({ value: c.address }).eq("key", "biz_address"),
+      supabase.from("settings").update({ value: c.phone }).eq("key", "biz_phone"),
+      supabase.from("settings").update({ value: c.schedule }).eq("key", "biz_schedule"),
+      supabase.from("settings").update({ value: c.cancelPolicy }).eq("key", "biz_cancel_policy"),
+    ]);
     setBizConfig(c);
-    try { localStorage.setItem("biz_config", JSON.stringify(c)); } catch {}
   };
 
   useEffect(() => {
@@ -984,14 +988,26 @@ export default function App() {
 
   useEffect(() => { loadData(); }, []);
 
-  async function loadData() {
+ async function loadData() {
     setLoading(true);
-    const [{ data: appts }, { data: blk }] = await Promise.all([
+    const [{ data: appts }, { data: blk }, { data: setts }] = await Promise.all([
       supabase.from("appointments").select("*").order("date").order("time"),
-      supabase.from("blocked_slots").select("*")
+      supabase.from("blocked_slots").select("*"),
+      supabase.from("settings").select("*")
     ]);
     setAppointments(appts || []);
     setBlocked((blk || []).map(b => ({ ...b, time: b.time ? b.time.slice(0,5) : b.time })));
+    if (setts) {
+      const get = (key, def) => setts.find(s => s.key === key)?.value || def;
+      setAdminPassword(get("admin_password", DEFAULT_ADMIN_PASSWORD));
+      setBizConfig({
+        name: get("biz_name", BUSINESS_NAME),
+        address: get("biz_address", ""),
+        phone: get("biz_phone", ""),
+        schedule: get("biz_schedule", "Lunes a Sábado · 09:30 – 21:30"),
+        cancelPolicy: get("biz_cancel_policy", "Cancelación gratuita con 24h de antelación"),
+      });
+    }
     setLoading(false);
   }
 
