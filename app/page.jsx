@@ -223,7 +223,7 @@ function BookingApp({ appointments, blocked, onBook, showToast, bizConfig }) {
   const formRef = useRef(null);
   const timeRef = useRef(null);
 
-  const occupiedTimes = appointments.filter(a => a.date === selectedDate && a.status === "confirmed").map(a => a.time);
+  const occupiedTimes = appointments.filter(a => a.date === selectedDate && a.status === "confirmed").map(a => a.time ? a.time.slice(0,5) : "");
   const blockedTimes = blocked.filter(b => b.date === selectedDate).map(b => b.time);
 
   const handleSelectDate = (d) => {
