@@ -825,7 +825,7 @@ function SettingsTab({ adminPassword, onPasswordChange, showToast }) {
 // ============================================================
 // ADMIN PANEL
 // ============================================================
-function AdminPanel({ appointments, blocked, onCancelAppt, onUpdateAppt, onBlock, onUnblock, onBlockDay, onLogout, showToast, adminPassword, onPasswordChange, bizConfig, onBizConfig, capacidad }) {
+function AdminPanel({ appointments, blocked, onCancelAppt, onUpdateAppt, onBlock, onUnblock, onBlockDay, onLogout, showToast, adminPassword, onPasswordChange, bizConfig, onBizConfig, capacidad, setCapacidad }) {dminPassword, onPasswordChange, bizConfig, onBizConfig, capacidad }) {
   const [tab, setTab] = useState("agenda");
   const [selectedDate, setSelectedDate] = useState(todayStr());
   const [editModal, setEditModal] = useState(null);
@@ -1112,7 +1112,7 @@ const [adminPassword, setAdminPassword] = useState(DEFAULT_ADMIN_PASSWORD);
       <div>
         {route==="home"&&<BookingApp appointments={appointments} blocked={blocked} onBook={handleBook} showToast={showToast} bizConfig={bizConfig} capacidad={capacidad} />}
         {route==="admin"&&!adminAuthed&&<AdminLogin onLogin={()=>setAdminAuthed(true)} adminPassword={adminPassword} onPasswordChange={handlePasswordChange} />}
-        {route==="admin"&&adminAuthed&&<AdminPanel appointments={appointments} blocked={blocked} onCancelAppt={handleCancel} onUpdateAppt={handleUpdate} onBlock={handleBlock} onUnblock={handleUnblock} onBlockDay={handleBlockDay} onLogout={()=>{setAdminAuthed(false);setRoute("home");}} showToast={showToast} adminPassword={adminPassword} onPasswordChange={handlePasswordChange} bizConfig={bizConfig} onBizConfig={handleBizConfig} capacidad={capacidad} />}
+        {route==="admin"&&adminAuthed&&<AdminPanel appointments={appointments} blocked={blocked} onCancelAppt={handleCancel} onUpdateAppt={handleUpdate} onBlock={handleBlock} onUnblock={handleUnblock} onBlockDay={handleBlockDay} onLogout={()=>{setAdminAuthed(false);setRoute("home");}} showToast={showToast} adminPassword={adminPassword} onPasswordChange={handlePasswordChange} bizConfig={bizConfig} onBizConfig={handleBizConfig} capacidad={capacidad} setCapacidad={setCapacidad} />}
         {isCancel&&<CancelPage appointmentId={cancelId} onCancel={handleCancel} />}
       </div>
       {toast&&<Toast message={toast} onDone={()=>setToast(null)} />}
