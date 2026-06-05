@@ -202,16 +202,20 @@ function Toast({ message, onDone }) {
 // ============================================================
 // HELPERS
 // ============================================================
-function getAvailableCount(date, appointments, blocked) {
-  const occupied = appointments.filter(a => a.date === date && a.status === "confirmed").map(a => a.time);
+function getAvailableCount(date, appointments, blocked, capacidad) {
+  const counts = {};
+  appointments.filter(a => a.date === date && a.status === "confirmed").forEach(a => {
+    const t = a.time ? a.time.slice(0,5) : "";
+    counts[t] = (counts[t] || 0) + 1;
+  });
   const bl = blocked.filter(b => b.date === date).map(b => b.time);
-  return ALL_SLOTS.filter(t => !occupied.includes(t) && !bl.includes(t)).length;
+  return ALL_SLOTS.filter(t => (counts[t] || 0) < capacidad && !bl.includes(t)).length;
 }
 
 // ============================================================
 // BOOKING APP (CLIENT)
 // ============================================================
-function BookingApp({ appointments, blocked, onBook, showToast, bizConfig }) {
+function BookingApp({ appointments, blocked, onBook, showToast, bizConfig, capacidad }) {
   const days = getNext30Days();
   const [step, setStep] = useState(1);
   const [selectedDate, setSelectedDate] = useState(days[0]);
@@ -223,8 +227,12 @@ function BookingApp({ appointments, blocked, onBook, showToast, bizConfig }) {
   const formRef = useRef(null);
   const timeRef = useRef(null);
 
-  const occupiedTimes = appointments.filter(a => a.date === selectedDate && a.status === "confirmed").map(a => a.time ? a.time.slice(0,5) : "");
+  const occupiedCounts = {};
+  appointments.filter(a => a.date === selectedDate && a.status === "confirmed").forEach(a => { const t = a.time ? a.time.slice(0,5) : ""; occupiedCounts[t] = (occupiedCounts[t] || 0) + 1; });
+  const occupiedTimes = Object.keys(occupiedCounts).filter(t => occupiedCounts[t] >= capacidad);
   const blockedTimes = blocked.filter(b => b.date === selectedDate).map(b => b.time);
+  const remainingSlots = {};
+  ALL_SLOTS.forEach(t => { const count = appointments.filter(a => a.date === selectedDate && a.status === "confirmed" && a.time && a.time.slice(0,5) === t).length; remainingSlots[t] = capacidad - count; });
 
   const handleSelectDate = (d) => {
     setSelectedDate(d); setSelectedTime(null);
@@ -304,7 +312,7 @@ function BookingApp({ appointments, blocked, onBook, showToast, bizConfig }) {
       <div className="calendar-strip">
         {days.map(d => {
           const dateObj = new Date(d + "T12:00:00");
-          const avail = getAvailableCount(d, appointments, blocked);
+          const avail = getAvailableCount(d, appointments, blocked, capacidad);
           const pct = avail / ALL_SLOTS.length;
           return (
             <div key={d} className={`day-card ${selectedDate === d ? "selected" : ""} ${d === todayStr() ? "today-card" : ""}`} onClick={() => handleSelectDate(d)}>
@@ -936,7 +944,20 @@ function AdminPanel({ appointments, blocked, onCancelAppt, onUpdateAppt, onBlock
         </div>
       )}
 
-      {tab==="biz"&&<BizSettingsTab bizConfig={bizConfig} onBizConfig={onBizConfig} showToast={showToast} />}
+{tab==="availability"&&capacidad&&(
+  <div style={{padding:"0 16px 10px"}}>
+    <div style={{background:"white",borderRadius:13,border:"1.5px solid var(--border)",padding:"14px 16px",marginBottom:10}}>
+      <div style={{fontWeight:700,fontSize:"0.88rem",marginBottom:10}}>Puestos de trabajo simultáneos</div>
+      <div style={{display:"flex",alignItems:"center",gap:12}}>
+        <button onClick={async()=>{if(capacidad>1){const n=capacidad-1;setCapacidad(n);await supabase.from("settings").update({value:String(n)}).eq("key","capacidad");}}} style={{width:36,height:36,borderRadius:8,border:"1.5px solid var(--border)",background:"white",fontSize:"1.2rem",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700}}>−</button>
+        <div style={{fontSize:"1.4rem",fontWeight:700,minWidth:30,textAlign:"center"}}>{capacidad}</div>
+        <button onClick={async()=>{const n=capacidad+1;setCapacidad(n);await supabase.from("settings").update({value:String(n)}).eq("key","capacidad");}} style={{width:36,height:36,borderRadius:8,border:"1.5px solid var(--border)",background:"white",fontSize:"1.2rem",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700}}>+</button>
+        <span style={{fontSize:"0.82rem",color:"var(--smoke)"}}>reservas por franja de 30 min</span>
+      </div>
+    </div>
+  </div>
+)}
+      {tab==="biz"&&<BizSettingsTab bizConfig={bizConfig} {onBizConfig} showToast={showToast} />}
       {tab==="settings"&&<SettingsTab adminPassword={adminPassword} onPasswordChange={onPasswordChange} showToast={showToast} />}
 
       {editModal&&<EditModal appt={editModal} appointments={appointments} blocked={blocked} days={days} onSave={async updated=>{await onUpdateAppt(updated);setEditModal(null);showToast("✅ Cita actualizada");}} onClose={()=>setEditModal(null)} />}
@@ -948,7 +969,7 @@ function AdminPanel({ appointments, blocked, onCancelAppt, onUpdateAppt, onBlock
 // MAIN APP
 // ============================================================
 export default function App() {
-  const [appointments, setAppointments] = useState([]);
+  const [appointments, setAppointments] = useState(1);
   const [blocked, setBlocked] = useState([]);
   const [loading, setLoading] = useState(true);
   const [route, setRoute] = useState("home");
@@ -1000,7 +1021,8 @@ const [adminPassword, setAdminPassword] = useState(DEFAULT_ADMIN_PASSWORD);
     if (setts) {
       const get = (key, def) => setts.find(s => s.key === key)?.value || def;
       setAdminPassword(get("admin_password", DEFAULT_ADMIN_PASSWORD));
-      setBizConfig({
+      setCapacidad(parseInt(get("capacidad", "1")));
+	setBizConfig({
         name: get("biz_name", BUSINESS_NAME),
         address: get("biz_address", ""),
         phone: get("biz_phone", ""),
@@ -1087,9 +1109,11 @@ const [adminPassword, setAdminPassword] = useState(DEFAULT_ADMIN_PASSWORD);
         </div>
       </div>
       <div>
-        {route==="home"&&<BookingApp appointments={appointments} blocked={blocked} onBook={handleBook} showToast={showToast} bizConfig={bizConfig} />}
+        {route==="home"&&<BookingApp appointments={appointments} blocked={blocked} onBook={handleBook} showToast={showToast} bizConfig={bizConfig} capacidad={capacidad} />}
         {route==="admin"&&!adminAuthed&&<AdminLogin onLogin={()=>setAdminAuthed(true)} adminPassword={adminPassword} onPasswordChange={handlePasswordChange} />}
-        {route==="admin"&&adminAuthed&&<AdminPanel appointments={appointments} blocked={blocked} onCancelAppt={handleCancel} onUpdateAppt={handleUpdate} onBlock={handleBlock} onUnblock={handleUnblock} onBlockDay={handleBlockDay} onLogout={()=>{setAdminAuthed(false);setRoute("home");}} showToast={showToast} adminPassword={adminPassword} onPasswordChange={handlePasswordChange} bizConfig={bizConfig} onBizConfig={handleBizConfig} />}
+        {route==="admin"&&adminAuthed&&<AdminPanel appointments={appointments} blocked={blocked} onCancelAppt={handleCancel} onUpdateAppt={handleUpdate} onBlock={handleBlock} onUnblock={handleUnblock} onBlockDay={handleBlockDay} onLogout={()=>{setAdminAuthed(false);setRoute("home");}} showToast={showToast} adminPassword={adminPassword} onPasswordChange={handlePasswordChange} bizConfig={bizConfig} onBizConfig={handleBizConfig} capacidad={capacidad} />}
+        {isCancel&&<CancelPage appointmentId={cancelId} onCancel={handleCancel} />}
+      </div>
         {isCancel&&<CancelPage appointmentId={cancelId} onCancel={handleCancel} />}
       </div>
       {toast&&<Toast message={toast} onDone={()=>setToast(null)} />}
