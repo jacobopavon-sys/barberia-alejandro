@@ -957,7 +957,7 @@ function AdminPanel({ appointments, blocked, onCancelAppt, onUpdateAppt, onBlock
     </div>
   </div>
 )}
-      {tab==="biz"&&<BizSettingsTab bizConfig={bizConfig} {onBizConfig} showToast={showToast} />}
+      {tab==="biz"&&<BizSettingsTab bizConfig={bizConfig} onBizConfig={onBizConfig} showToast={showToast} />}
       {tab==="settings"&&<SettingsTab adminPassword={adminPassword} onPasswordChange={onPasswordChange} showToast={showToast} />}
 
       {editModal&&<EditModal appt={editModal} appointments={appointments} blocked={blocked} days={days} onSave={async updated=>{await onUpdateAppt(updated);setEditModal(null);showToast("✅ Cita actualizada");}} onClose={()=>setEditModal(null)} />}
