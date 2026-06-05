@@ -13,7 +13,7 @@ const supabase = createClient(
 // ============================================================
 // CONSTANTS
 // ============================================================
-const BUSINESS_NAME = "Barbería Alejandro";
+const BUSINESS_NAME = "Barbería Pavón";
 const DEFAULT_ADMIN_PASSWORD = "admin1234";
 const MASTER_RECOVERY_CODE = "BARBERIA-MASTER-2025";
 const START_HOUR = 9.5;
