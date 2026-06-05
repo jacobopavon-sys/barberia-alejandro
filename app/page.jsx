@@ -1114,8 +1114,6 @@ const [adminPassword, setAdminPassword] = useState(DEFAULT_ADMIN_PASSWORD);
         {route==="admin"&&adminAuthed&&<AdminPanel appointments={appointments} blocked={blocked} onCancelAppt={handleCancel} onUpdateAppt={handleUpdate} onBlock={handleBlock} onUnblock={handleUnblock} onBlockDay={handleBlockDay} onLogout={()=>{setAdminAuthed(false);setRoute("home");}} showToast={showToast} adminPassword={adminPassword} onPasswordChange={handlePasswordChange} bizConfig={bizConfig} onBizConfig={handleBizConfig} capacidad={capacidad} />}
         {isCancel&&<CancelPage appointmentId={cancelId} onCancel={handleCancel} />}
       </div>
-        {isCancel&&<CancelPage appointmentId={cancelId} onCancel={handleCancel} />}
-      </div>
       {toast&&<Toast message={toast} onDone={()=>setToast(null)} />}
     </div>
   );
