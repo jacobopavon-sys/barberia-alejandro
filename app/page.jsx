@@ -969,9 +969,10 @@ function AdminPanel({ appointments, blocked, onCancelAppt, onUpdateAppt, onBlock
 // MAIN APP
 // ============================================================
 export default function App() {
-  const [appointments, setAppointments] = useState(1);
+  const [appointments, setAppointments] = useState([]);
   const [blocked, setBlocked] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [capacidad, setCapacidad] = useState(1);
   const [route, setRoute] = useState("home");
   const [adminAuthed, setAdminAuthed] = useState(false);
   const [toast, setToast] = useState(null);
