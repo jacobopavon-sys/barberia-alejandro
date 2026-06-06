@@ -1062,8 +1062,8 @@ const [adminPassword, setAdminPassword] = useState(DEFAULT_ADMIN_PASSWORD);
   };
 
   const handleBlock = async (date, time) => {
-    await supabase.from("blocked_slots").insert({ date, time }).onConflict("date,time").ignore();
-    setBlocked(prev => [...prev, { date, time }]);
+    const { error } = await supabase.from("blocked_slots").upsert({ date, time }, { onConflict: "date,time" });
+    if (!error) setBlocked(prev => [...prev, { date, time }]);
   };
 
   const handleUnblock = async (date, time) => {
