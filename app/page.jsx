@@ -333,11 +333,10 @@ function BookingApp({ appointments, blocked, onBook, showToast, bizConfig, capac
               const isPartial = !isOccupied && efectivos < capacidad;
               return (
                 <div key={t}
-                  className={`time-slot${isOccupied?" occupied":""}${isSelected?" selected":""}${isPartial&&!isSelected?" partial":""}`}
+                  className={`time-slot${isOccupied?" occupied":""}${isSelected?" selected":""}`}
                   onClick={() => handleSelectTime(t)}>
                   {t}
                   {isOccupied && <div style={{fontSize:"0.55rem",marginTop:1,opacity:0.7}}>Ocupado</div>}
-                  {isPartial && !isSelected && <span className="partial-badge">{efectivos}</span>}
                 </div>
               );
             })}
