@@ -2,17 +2,11 @@
 import { createClient } from '@supabase/supabase-js';
 import { useState, useEffect, useCallback, useRef } from "react";
 
-// ============================================================
-// SUPABASE CLIENT
-// ============================================================
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 );
 
-// ============================================================
-// CONSTANTS
-// ============================================================
 const BUSINESS_NAME = "Barbería Pavón";
 const DEFAULT_ADMIN_PASSWORD = "admin1234";
 const MASTER_RECOVERY_CODE = "BARBERIA-MASTER-2025";
@@ -51,9 +45,6 @@ function getNext30Days() {
 }
 function getFirstName(n) { return n.trim().split(" ")[0]; }
 
-// ============================================================
-// ICONS
-// ============================================================
 const Icon = {
   scissors: () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{width:20,height:20}}><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>),
   calendar: () => (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{width:18,height:18}}><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>),
@@ -75,9 +66,6 @@ const Icon = {
   google: () => (<svg viewBox="0 0 24 24" style={{width:16,height:16}} fill="currentColor"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>),
 };
 
-// ============================================================
-// CSS
-// ============================================================
 const GLOBAL_CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap');
   *{box-sizing:border-box;margin:0;padding:0}
@@ -90,13 +78,11 @@ const GLOBAL_CSS = `
   .app-header p{color:#888;font-size:0.72rem;margin-top:2px;letter-spacing:0.08em;text-transform:uppercase;font-weight:300}
   .steps{display:flex;padding:0 20px 14px;background:var(--ink)}
   .step-dot{flex:1;height:3px;background:#333;border-radius:2px;margin:0 2px;transition:background 0.4s}
-  .step-dot.active{background:var(--gold)}
-  .step-dot.done{background:var(--gold-dark)}
+  .step-dot.active{background:var(--gold)}.step-dot.done{background:var(--gold-dark)}
   .calendar-strip{display:flex;gap:7px;overflow-x:auto;padding:14px 20px;scroll-snap-type:x mandatory;scrollbar-width:none}
   .calendar-strip::-webkit-scrollbar{display:none}
   .day-card{flex-shrink:0;width:54px;text-align:center;padding:9px 0;border-radius:12px;border:1.5px solid var(--border);cursor:pointer;scroll-snap-align:start;transition:all 0.2s;background:white}
-  .day-card:hover{border-color:var(--gold)}
-  .day-card.selected{background:var(--ink);border-color:var(--ink);color:var(--gold)}
+  .day-card:hover{border-color:var(--gold)}.day-card.selected{background:var(--ink);border-color:var(--ink);color:var(--gold)}
   .day-card .day-name{font-size:0.6rem;text-transform:uppercase;letter-spacing:0.05em;opacity:0.6}
   .day-card.selected .day-name{opacity:0.7;color:var(--gold-light)}
   .day-card .day-num{font-size:1.15rem;font-weight:600;margin-top:2px}
@@ -104,11 +90,13 @@ const GLOBAL_CSS = `
   .avail-badge{font-size:0.58rem;margin-top:2px;font-weight:700}
   .avail-few{color:#e67e22}.avail-none{color:var(--red)}.avail-ok{color:var(--green)}
   .time-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;padding:4px 20px 20px}
-  .time-slot{padding:11px 0;text-align:center;border-radius:10px;border:1.5px solid var(--border);font-size:0.88rem;font-weight:500;cursor:pointer;transition:all 0.18s;background:white}
+  .time-slot{padding:11px 0;text-align:center;border-radius:10px;border:1.5px solid var(--border);font-size:0.88rem;font-weight:500;cursor:pointer;transition:all 0.18s;background:white;position:relative}
   .time-slot:hover:not(.occupied):not(.blocked){border-color:var(--gold);background:#fffdf5;transform:translateY(-1px)}
   .time-slot.selected{background:var(--gold);border-color:var(--gold);color:white;font-weight:700}
   .time-slot.occupied{background:#f5f5f5;color:#ccc;cursor:not-allowed;border-color:#eee;font-size:0.72rem}
   .time-slot.blocked{background:repeating-linear-gradient(45deg,#f5f5f5,#f5f5f5 5px,#ebebeb 5px,#ebebeb 10px);color:#bbb;cursor:not-allowed;border-color:#ddd;font-size:0.72rem}
+  .time-slot.partial{border-color:#e67e22;border-width:2px}
+  .partial-badge{position:absolute;top:3px;right:3px;background:#e67e22;color:white;border-radius:4px;font-size:0.55rem;padding:1px 4px;font-weight:700}
   .form-section{padding:0 20px 28px}
   .input-group{margin-bottom:14px}
   .input-group label{display:block;font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--smoke);margin-bottom:5px}
@@ -189,31 +177,44 @@ const GLOBAL_CSS = `
   .loading-screen{display:flex;align-items:center;justify-content:center;min-height:60vh;flex-direction:column;gap:16px;color:var(--smoke)}
   .spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite}
   @keyframes spin{to{transform:rotate(360deg)}}
+  .block-panel{background:white;border-radius:14px;border:1.5px solid var(--border);padding:16px;margin:0 16px 12px}
+  .block-panel-title{font-weight:700;font-size:0.88rem;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  .stepper{display:flex;align-items:center;gap:10px}
+  .stepper-btn{width:34px;height:34px;border-radius:8px;border:1.5px solid var(--border);background:white;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;transition:all 0.2s}
+  .stepper-btn:hover{border-color:var(--gold)}
+  .stepper-val{font-size:1.3rem;font-weight:700;min-width:28px;text-align:center}
+  .block-list{margin-top:10px}
+  .block-item{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:#fff8f0;border:1px solid var(--gold-light);border-radius:8px;margin-bottom:6px;font-size:0.82rem}
+  .block-item-info{display:flex;align-items:center;gap:8px}
+  .block-badge{background:var(--gold);color:white;border-radius:5px;padding:2px 7px;font-size:0.7rem;font-weight:700}
 `;
 
-// ============================================================
-// TOAST
-// ============================================================
 function Toast({ message, onDone }) {
   useEffect(() => { const t = setTimeout(onDone, 3000); return () => clearTimeout(t); }, [onDone]);
   return <div className="toast">{message}</div>;
 }
 
-// ============================================================
-// HELPERS
-// ============================================================
+// Calcula cuántos puestos están bloqueados parcialmente en una franja
+function getBlockedPuestosForSlot(date, time, blocked) {
+  return blocked.filter(b => b.date === date && b.time === time).reduce((sum, b) => sum + (b.puestos || 1), 0);
+}
+
+// Calcula huecos disponibles para un día
 function getAvailableCount(date, appointments, blocked, capacidad) {
   const counts = {};
   appointments.filter(a => a.date === date && a.status === "confirmed").forEach(a => {
     const t = a.time ? a.time.slice(0,5) : "";
     counts[t] = (counts[t] || 0) + 1;
   });
-  const bl = blocked.filter(b => b.date === date).map(b => b.time);
-  return ALL_SLOTS.filter(t => (counts[t] || 0) < capacidad && !bl.includes(t)).length;
+  return ALL_SLOTS.filter(t => {
+    const reservas = counts[t] || 0;
+    const bloqueados = getBlockedPuestosForSlot(date, t, blocked);
+    return reservas < (capacidad - bloqueados);
+  }).length;
 }
 
 // ============================================================
-// BOOKING APP (CLIENT)
+// BOOKING APP
 // ============================================================
 function BookingApp({ appointments, blocked, onBook, showToast, bizConfig, capacidad }) {
   const days = getNext30Days();
@@ -227,12 +228,12 @@ function BookingApp({ appointments, blocked, onBook, showToast, bizConfig, capac
   const formRef = useRef(null);
   const timeRef = useRef(null);
 
-  const occupiedCounts = {};
-  appointments.filter(a => a.date === selectedDate && a.status === "confirmed").forEach(a => { const t = a.time ? a.time.slice(0,5) : ""; occupiedCounts[t] = (occupiedCounts[t] || 0) + 1; });
-  const occupiedTimes = Object.keys(occupiedCounts).filter(t => occupiedCounts[t] >= capacidad);
-  const blockedTimes = blocked.filter(b => b.date === selectedDate).map(b => b.time);
-  const remainingSlots = {};
-  ALL_SLOTS.forEach(t => { const count = appointments.filter(a => a.date === selectedDate && a.status === "confirmed" && a.time && a.time.slice(0,5) === t).length; remainingSlots[t] = capacidad - count; });
+  // Para cada franja: cuántos puestos efectivos quedan
+  const getEffectiveAvailable = (t) => {
+    const reservas = appointments.filter(a => a.date === selectedDate && a.status === "confirmed" && a.time && a.time.slice(0,5) === t).length;
+    const bloqueados = getBlockedPuestosForSlot(selectedDate, t, blocked);
+    return capacidad - reservas - bloqueados;
+  };
 
   const handleSelectDate = (d) => {
     setSelectedDate(d); setSelectedTime(null);
@@ -241,7 +242,7 @@ function BookingApp({ appointments, blocked, onBook, showToast, bizConfig, capac
   };
 
   const handleSelectTime = (t) => {
-    if (occupiedTimes.includes(t) || blockedTimes.includes(t)) return;
+    if (getEffectiveAvailable(t) <= 0) return;
     setSelectedTime(t); setStep(3);
     setTimeout(() => formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
   };
@@ -251,13 +252,9 @@ function BookingApp({ appointments, blocked, onBook, showToast, bizConfig, capac
     setLoading(true);
     try {
       const newAppt = await onBook({
-        date: selectedDate,
-        time: selectedTime + ":00",
-        name: form.name.trim(),
-        phone: form.phone.trim(),
-        email: form.email.trim(),
-        notes: "",
-        status: "confirmed"
+        date: selectedDate, time: selectedTime + ":00",
+        name: form.name.trim(), phone: form.phone.trim(),
+        email: form.email.trim(), notes: "", status: "confirmed"
       });
       setConfirmedAppt({ ...newAppt, time: selectedTime });
     } catch (e) {
@@ -277,30 +274,28 @@ function BookingApp({ appointments, blocked, onBook, showToast, bizConfig, capac
   if (confirmedAppt) return (
     <div className="success-screen">
       <div className="success-icon"><Icon.sparkle /></div>
-      <h2 className="serif" style={{ fontSize: "1.55rem", letterSpacing: "-0.02em", marginBottom: 5 }}>¡Reserva Confirmada!</h2>
-      <p style={{ color: "var(--smoke)", fontSize: "0.88rem", marginBottom: 4 }}>
-        ¡Hasta el {formatDateShort(confirmedAppt.date)}, <strong>{getFirstName(confirmedAppt.name)}</strong>!
-      </p>
-      {confirmedAppt.email && <p style={{ color: "var(--green)", fontSize: "0.78rem", marginBottom: 16 }}>📧 Confirmación enviada a {confirmedAppt.email}</p>}
+      <h2 className="serif" style={{fontSize:"1.55rem",letterSpacing:"-0.02em",marginBottom:5}}>¡Reserva Confirmada!</h2>
+      <p style={{color:"var(--smoke)",fontSize:"0.88rem",marginBottom:4}}>¡Hasta el {formatDateShort(confirmedAppt.date)}, <strong>{getFirstName(confirmedAppt.name)}</strong>!</p>
+      {confirmedAppt.email && <p style={{color:"var(--green)",fontSize:"0.78rem",marginBottom:16}}>📧 Confirmación enviada a {confirmedAppt.email}</p>}
       <div className="success-card">
-        <div className="success-detail"><span className="icon-wrap"><Icon.calendar /></span><span style={{ textTransform: "capitalize" }}>{formatDate(confirmedAppt.date)}</span></div>
+        <div className="success-detail"><span className="icon-wrap"><Icon.calendar /></span><span style={{textTransform:"capitalize"}}>{formatDate(confirmedAppt.date)}</span></div>
         <div className="success-detail"><span className="icon-wrap"><Icon.clock /></span><span>{confirmedAppt.time} h · 30 minutos</span></div>
         <div className="success-detail"><span className="icon-wrap"><Icon.user /></span><span>{confirmedAppt.name}</span></div>
         <div className="success-detail"><span className="icon-wrap"><Icon.phone /></span><span>{confirmedAppt.phone}</span></div>
       </div>
       <div className="cal-buttons">
-        <a href={googleCalLink} target="_blank" rel="noreferrer" style={{ flex: 1, textDecoration: "none" }}>
-          <button className="btn-secondary" style={{ marginTop: 0, width: "100%", fontSize: "0.8rem" }}><Icon.google /> Google Cal</button>
+        <a href={googleCalLink} target="_blank" rel="noreferrer" style={{flex:1,textDecoration:"none"}}>
+          <button className="btn-secondary" style={{marginTop:0,width:"100%",fontSize:"0.8rem"}}><Icon.google /> Google Cal</button>
         </a>
       </div>
       <div className="cancel-link">
-        <strong style={{ display: "block", marginBottom: 3, color: "var(--charcoal)", fontSize: "0.8rem" }}>¿Necesitas cancelar?</strong>
-        <span style={{ color: "var(--gold)", fontSize: "0.78rem" }}>{typeof window !== "undefined" ? window.location.origin : ""}/cancelar/{confirmedAppt.id}</span>
-        <p style={{ marginTop: 3, fontSize: "0.7rem" }}>Guarda este enlace para anular tu cita</p>
+        <strong style={{display:"block",marginBottom:3,color:"var(--charcoal)",fontSize:"0.8rem"}}>¿Necesitas cancelar?</strong>
+        <span style={{color:"var(--gold)",fontSize:"0.78rem"}}>{typeof window !== "undefined" ? window.location.origin : ""}/cancelar/{confirmedAppt.id}</span>
+        <p style={{marginTop:3,fontSize:"0.7rem"}}>Guarda este enlace para anular tu cita</p>
       </div>
-      <button className="btn-primary" style={{ marginTop: 18 }} onClick={() => {
+      <button className="btn-primary" style={{marginTop:18}} onClick={() => {
         setStep(1); setSelectedDate(days[0]); setSelectedTime(null);
-        setForm({ name: "", phone: "", email: "" }); setPrivacy(false); setConfirmedAppt(null);
+        setForm({name:"",phone:"",email:""}); setPrivacy(false); setConfirmedAppt(null);
       }}>Hacer otra reserva</button>
     </div>
   );
@@ -315,12 +310,12 @@ function BookingApp({ appointments, blocked, onBook, showToast, bizConfig, capac
           const avail = getAvailableCount(d, appointments, blocked, capacidad);
           const pct = avail / ALL_SLOTS.length;
           return (
-            <div key={d} className={`day-card ${selectedDate === d ? "selected" : ""} ${d === todayStr() ? "today-card" : ""}`} onClick={() => handleSelectDate(d)}>
-              <div className="day-name">{dateObj.toLocaleDateString("es-ES", { weekday: "short" })}</div>
+            <div key={d} className={`day-card ${selectedDate===d?"selected":""} ${d===todayStr()?"today-card":""}`} onClick={() => handleSelectDate(d)}>
+              <div className="day-name">{dateObj.toLocaleDateString("es-ES",{weekday:"short"})}</div>
               <div className="day-num">{dateObj.getDate()}</div>
-              <div className="day-month" style={{fontSize:"0.58rem",opacity:0.5,marginTop:1}}>{dateObj.toLocaleDateString("es-ES", { month: "short" })}</div>
-              {avail === 0 ? <div className="avail-badge avail-none">Lleno</div>
-                : pct <= 0.25 ? <div className="avail-badge avail-few">{avail} lib.</div>
+              <div style={{fontSize:"0.58rem",opacity:0.5,marginTop:1}}>{dateObj.toLocaleDateString("es-ES",{month:"short"})}</div>
+              {avail===0 ? <div className="avail-badge avail-none">Lleno</div>
+                : pct<=0.25 ? <div className="avail-badge avail-few">{avail} lib.</div>
                 : <div className="avail-badge avail-ok">{avail} lib.</div>}
             </div>
           );
@@ -332,14 +327,17 @@ function BookingApp({ appointments, blocked, onBook, showToast, bizConfig, capac
           <div className="section-title"><Icon.clock />{formatDateShort(selectedDate)} — elige hora <span className="real-time-dot" /></div>
           <div className="time-grid">
             {ALL_SLOTS.map(t => {
-              const isOccupied = occupiedTimes.includes(t);
-              const isBlocked = blockedTimes.includes(t);
+              const efectivos = getEffectiveAvailable(t);
+              const isOccupied = efectivos <= 0;
               const isSelected = selectedTime === t;
+              const isPartial = !isOccupied && efectivos < capacidad;
               return (
-                <div key={t} className={`time-slot${isOccupied?" occupied":""}${isBlocked&&!isOccupied?" blocked":""}${isSelected?" selected":""}`} onClick={() => handleSelectTime(t)}>
+                <div key={t}
+                  className={`time-slot${isOccupied?" occupied":""}${isSelected?" selected":""}${isPartial&&!isSelected?" partial":""}`}
+                  onClick={() => handleSelectTime(t)}>
                   {t}
                   {isOccupied && <div style={{fontSize:"0.55rem",marginTop:1,opacity:0.7}}>Ocupado</div>}
-                  {isBlocked && !isOccupied && <div style={{fontSize:"0.55rem",marginTop:1}}>No disp.</div>}
+                  {isPartial && !isSelected && <span className="partial-badge">{efectivos}</span>}
                 </div>
               );
             })}
@@ -358,23 +356,14 @@ function BookingApp({ appointments, blocked, onBook, showToast, bizConfig, capac
               <div className="confirm-row"><span className="icon-wrap"><Icon.calendar /></span><span style={{textTransform:"capitalize"}}>{formatDate(selectedDate)}</span></div>
               <div className="confirm-row"><span className="icon-wrap"><Icon.clock /></span><span>{selectedTime} h · 30 minutos</span></div>
             </div>
-            <div className="input-group">
-              <label>Nombre completo</label>
-              <input type="text" placeholder="Ej: Carlos García" value={form.name} onChange={e => setForm(f => ({...f, name: e.target.value}))} />
-            </div>
-            <div className="input-group">
-              <label>Teléfono</label>
-              <input type="tel" placeholder="Ej: 612 345 678" value={form.phone} onChange={e => setForm(f => ({...f, phone: e.target.value}))} />
-            </div>
-            <div className="input-group">
-              <label>Correo electrónico <span className="optional-tag">(opcional)</span></label>
-              <input type="email" placeholder="tu@email.com" value={form.email} onChange={e => setForm(f => ({...f, email: e.target.value}))} />
-            </div>
+            <div className="input-group"><label>Nombre completo</label><input type="text" placeholder="Ej: Carlos García" value={form.name} onChange={e => setForm(f => ({...f,name:e.target.value}))} /></div>
+            <div className="input-group"><label>Teléfono</label><input type="tel" placeholder="Ej: 612 345 678" value={form.phone} onChange={e => setForm(f => ({...f,phone:e.target.value}))} /></div>
+            <div className="input-group"><label>Correo electrónico <span className="optional-tag">(opcional)</span></label><input type="email" placeholder="tu@email.com" value={form.email} onChange={e => setForm(f => ({...f,email:e.target.value}))} /></div>
             <div className="privacy-row">
               <input type="checkbox" checked={privacy} onChange={e => setPrivacy(e.target.checked)} />
               <p>He leído y acepto la <a href="#">Política de Privacidad</a>. Mis datos se usarán exclusivamente para gestionar esta reserva.</p>
             </div>
-            <button className="btn-primary" onClick={handleSubmit} disabled={!form.name.trim() || !form.phone.trim() || !privacy || loading}>
+            <button className="btn-primary" onClick={handleSubmit} disabled={!form.name.trim()||!form.phone.trim()||!privacy||loading}>
               {loading ? "Guardando..." : <><Icon.check /> Confirmar reserva</>}
             </button>
           </div>
@@ -383,9 +372,9 @@ function BookingApp({ appointments, blocked, onBook, showToast, bizConfig, capac
 
       {step < 3 && (
         <div className="info-box">
-          ✂️ <strong>{bizConfig?.name || BUSINESS_NAME}</strong>{bizConfig?.address ? ` · ${bizConfig.address}` : ""}<br />
-          {bizConfig?.schedule || "Lunes a Sábado · 09:30 – 21:30"} · Citas de 30 min<br />
-          {bizConfig?.phone ? `📞 ${bizConfig.phone} · ` : ""}{bizConfig?.cancelPolicy || "Cancelación gratuita 24h antes"}
+          ✂️ <strong>{bizConfig?.name||BUSINESS_NAME}</strong>{bizConfig?.address?` · ${bizConfig.address}`:""}<br />
+          {bizConfig?.schedule||"Lunes a Sábado · 09:30 – 21:30"} · Citas de 30 min<br />
+          {bizConfig?.phone?`📞 ${bizConfig.phone} · `:""}{bizConfig?.cancelPolicy||"Cancelación gratuita 24h antes"}
         </div>
       )}
     </div>
@@ -403,38 +392,21 @@ function CancelPage({ appointmentId, onCancel }) {
   useEffect(() => {
     async function load() {
       const { data } = await supabase.from("appointments").select("*").eq("id", appointmentId).single();
-      setAppt(data);
-      setLoading(false);
+      setAppt(data); setLoading(false);
     }
     if (appointmentId) load();
   }, [appointmentId]);
 
   const handleCancel = async () => {
     await supabase.from("appointments").update({ status: "cancelled" }).eq("id", appointmentId);
-    onCancel(appointmentId);
-    setDone(true);
+    onCancel(appointmentId); setDone(true);
   };
 
   if (loading) return <div className="cancel-page"><div className="spinner" style={{margin:"0 auto"}}/></div>;
-
-  if (done) return (
-    <div className="cancel-page">
-      <div style={{fontSize:"3rem",marginBottom:12}}>✅</div>
-      <h2 className="serif" style={{marginBottom:8}}>Cita cancelada</h2>
-      <p style={{color:"var(--smoke)",fontSize:"0.88rem"}}>Tu reserva ha sido anulada. ¡Esperamos verte pronto!</p>
-    </div>
-  );
-
-  if (!appt || appt.status === "cancelled") return (
-    <div className="cancel-page">
-      <div style={{fontSize:"3rem",marginBottom:12}}>🔍</div>
-      <h2 className="serif" style={{marginBottom:8}}>Reserva no encontrada</h2>
-      <p style={{color:"var(--smoke)",fontSize:"0.88rem"}}>Este enlace no corresponde a ninguna cita activa.</p>
-    </div>
-  );
+  if (done) return (<div className="cancel-page"><div style={{fontSize:"3rem",marginBottom:12}}>✅</div><h2 className="serif" style={{marginBottom:8}}>Cita cancelada</h2><p style={{color:"var(--smoke)",fontSize:"0.88rem"}}>Tu reserva ha sido anulada. ¡Esperamos verte pronto!</p></div>);
+  if (!appt || appt.status === "cancelled") return (<div className="cancel-page"><div style={{fontSize:"3rem",marginBottom:12}}>🔍</div><h2 className="serif" style={{marginBottom:8}}>Reserva no encontrada</h2><p style={{color:"var(--smoke)",fontSize:"0.88rem"}}>Este enlace no corresponde a ninguna cita activa.</p></div>);
 
   const displayTime = appt.time ? appt.time.slice(0,5) : "";
-
   return (
     <div className="cancel-page">
       <div style={{background:"var(--ink)",borderRadius:20,padding:"20px 24px",marginBottom:20,textAlign:"center"}}>
@@ -477,8 +449,7 @@ function AdminLogin({ onLogin, adminPassword, onPasswordChange }) {
     if (masterCode !== MASTER_RECOVERY_CODE) { setRecoveryError("Código maestro incorrecto."); return; }
     if (newPwd.length < 6) { setRecoveryError("Mínimo 6 caracteres."); return; }
     if (newPwd !== confirmPwd) { setRecoveryError("Las contraseñas no coinciden."); return; }
-    onPasswordChange(newPwd);
-    setRecoveryDone(true);
+    onPasswordChange(newPwd); setRecoveryDone(true);
   };
 
   if (recoveryDone) return (
@@ -497,24 +468,9 @@ function AdminLogin({ onLogin, adminPassword, onPasswordChange }) {
       <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:6,color:"var(--gold)"}}><Icon.lock /><h2 className="serif" style={{fontSize:"1.3rem"}}>Recuperar acceso</h2></div>
       <p style={{color:"var(--smoke)",fontSize:"0.82rem",marginBottom:22,lineHeight:1.6}}>Introduce el código maestro y establece una nueva contraseña.</p>
       {recoveryError && <div style={{background:"#fff5f5",border:"1px solid #fcc",borderRadius:10,padding:"10px 14px",marginBottom:14,fontSize:"0.82rem",color:"var(--red)"}}>⚠️ {recoveryError}</div>}
-      <div className="input-group">
-        <label>Código maestro</label>
-        <div style={{position:"relative",display:"flex",alignItems:"center"}}>
-          <input type={showMaster?"text":"password"} placeholder="Código de recuperación" value={masterCode} onChange={e => setMasterCode(e.target.value)} style={{paddingRight:44}} />
-          <button type="button" onClick={() => setShowMaster(v=>!v)} style={{position:"absolute",right:14,background:"none",border:"none",cursor:"pointer",color:"var(--smoke)"}}>👁</button>
-        </div>
-      </div>
-      <div className="input-group">
-        <label>Nueva contraseña</label>
-        <div style={{position:"relative",display:"flex",alignItems:"center"}}>
-          <input type={showNew?"text":"password"} placeholder="Mínimo 6 caracteres" value={newPwd} onChange={e => setNewPwd(e.target.value)} style={{paddingRight:44}} />
-          <button type="button" onClick={() => setShowNew(v=>!v)} style={{position:"absolute",right:14,background:"none",border:"none",cursor:"pointer",color:"var(--smoke)"}}>👁</button>
-        </div>
-      </div>
-      <div className="input-group">
-        <label>Repetir contraseña</label>
-        <input type="password" placeholder="Repite la contraseña" value={confirmPwd} onChange={e => setConfirmPwd(e.target.value)} style={{borderColor:confirmPwd&&confirmPwd!==newPwd?"var(--red)":confirmPwd&&confirmPwd===newPwd?"var(--green)":undefined}} />
-      </div>
+      <div className="input-group"><label>Código maestro</label><div style={{position:"relative",display:"flex",alignItems:"center"}}><input type={showMaster?"text":"password"} placeholder="Código de recuperación" value={masterCode} onChange={e => setMasterCode(e.target.value)} style={{paddingRight:44}} /><button type="button" onClick={() => setShowMaster(v=>!v)} style={{position:"absolute",right:14,background:"none",border:"none",cursor:"pointer",color:"var(--smoke)"}}>👁</button></div></div>
+      <div className="input-group"><label>Nueva contraseña</label><div style={{position:"relative",display:"flex",alignItems:"center"}}><input type={showNew?"text":"password"} placeholder="Mínimo 6 caracteres" value={newPwd} onChange={e => setNewPwd(e.target.value)} style={{paddingRight:44}} /><button type="button" onClick={() => setShowNew(v=>!v)} style={{position:"absolute",right:14,background:"none",border:"none",cursor:"pointer",color:"var(--smoke)"}}>👁</button></div></div>
+      <div className="input-group"><label>Repetir contraseña</label><input type="password" placeholder="Repite la contraseña" value={confirmPwd} onChange={e => setConfirmPwd(e.target.value)} style={{borderColor:confirmPwd&&confirmPwd!==newPwd?"var(--red)":confirmPwd&&confirmPwd===newPwd?"var(--green)":undefined}} /></div>
       <button className="btn-primary" onClick={handleRecover} disabled={!masterCode||!newPwd||!confirmPwd}>🔓 Restablecer contraseña</button>
     </div>
   );
@@ -523,11 +479,7 @@ function AdminLogin({ onLogin, adminPassword, onPasswordChange }) {
     <div className="login-page">
       <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:28,color:"var(--gold)"}}><Icon.scissors /><h2 className="serif" style={{fontSize:"1.4rem"}}>{BUSINESS_NAME}</h2></div>
       <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:22,color:"var(--smoke)"}}><Icon.lock /><span style={{fontSize:"0.82rem",fontWeight:600,textTransform:"uppercase",letterSpacing:"0.1em"}}>Panel de Control</span></div>
-      <div className="input-group">
-        <label>Contraseña de administrador</label>
-        <input type="password" placeholder="••••••••" value={pwd} onChange={e => setPwd(e.target.value)} onKeyDown={e => e.key==="Enter"&&handleLogin()} style={{borderColor:loginError?"var(--red)":undefined}} autoComplete="current-password" />
-        {loginError && <p style={{color:"var(--red)",fontSize:"0.78rem",marginTop:5}}>Contraseña incorrecta.</p>}
-      </div>
+      <div className="input-group"><label>Contraseña de administrador</label><input type="password" placeholder="••••••••" value={pwd} onChange={e => setPwd(e.target.value)} onKeyDown={e => e.key==="Enter"&&handleLogin()} style={{borderColor:loginError?"var(--red)":undefined}} autoComplete="current-password" />{loginError&&<p style={{color:"var(--red)",fontSize:"0.78rem",marginTop:5}}>Contraseña incorrecta.</p>}</div>
       <button className="btn-primary" onClick={handleLogin} style={{marginTop:6}}><Icon.lock /> Acceder al panel</button>
       <button onClick={() => { setMode("recover"); setLoginError(false); setPwd(""); }} style={{background:"none",border:"none",width:"100%",marginTop:16,color:"var(--smoke)",fontSize:"0.82rem",cursor:"pointer",fontFamily:"'DM Sans',sans-serif",textDecoration:"underline",textDecorationStyle:"dotted"}}>¿Olvidaste la contraseña?</button>
     </div>
@@ -535,14 +487,17 @@ function AdminLogin({ onLogin, adminPassword, onPasswordChange }) {
 }
 
 // ============================================================
-// EDIT MODAL
+// MODALS
 // ============================================================
-function EditModal({ appt, appointments, blocked, days, onSave, onClose }) {
+function EditModal({ appt, appointments, blocked, days, capacidad, onSave, onClose }) {
   const [date, setDate] = useState(appt.date);
   const [time, setTime] = useState(appt.time ? appt.time.slice(0,5) : "");
-  const occupied = appointments.filter(a => a.date === date && a.status === "confirmed" && a.id !== appt.id).map(a => a.time ? a.time.slice(0,5) : "");
-  const bl = blocked.filter(b => b.date === date).map(b => b.time);
-  const available = ALL_SLOTS.filter(t => !occupied.includes(t) && !bl.includes(t));
+  const getAvail = (t) => {
+    const reservas = appointments.filter(a => a.date === date && a.status === "confirmed" && a.id !== appt.id && a.time && a.time.slice(0,5) === t).length;
+    const bloqueados = getBlockedPuestosForSlot(date, t, blocked);
+    return capacidad - reservas - bloqueados;
+  };
+  const available = ALL_SLOTS.filter(t => getAvail(t) > 0);
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-sheet" onClick={e => e.stopPropagation()}>
@@ -551,16 +506,13 @@ function EditModal({ appt, appointments, blocked, days, onSave, onClose }) {
         <div className="input-group"><label>Nueva hora</label><select value={time} onChange={e => setTime(e.target.value)}><option value="">-- Seleccionar --</option>{available.map(t => <option key={t} value={t}>{t}</option>)}</select></div>
         <div style={{display:"flex",gap:10,marginTop:8}}>
           <button className="btn-secondary" onClick={onClose} style={{marginTop:0}}>Cancelar</button>
-          <button className="btn-primary" style={{marginTop:0}} onClick={() => time && onSave({...appt, date, time: time+":00"})} disabled={!time}>Guardar</button>
+          <button className="btn-primary" style={{marginTop:0}} onClick={() => time && onSave({...appt,date,time:time+":00"})} disabled={!time}>Guardar</button>
         </div>
       </div>
     </div>
   );
 }
 
-// ============================================================
-// NOTE MODAL
-// ============================================================
 function NoteModal({ appt, onSave, onClose }) {
   const [note, setNote] = useState(appt.notes || "");
   return (
@@ -570,8 +522,92 @@ function NoteModal({ appt, onSave, onClose }) {
         <div className="input-group"><label>Nota interna</label><textarea placeholder="Solo visible para el admin..." value={note} onChange={e => setNote(e.target.value)} /></div>
         <div style={{display:"flex",gap:10,marginTop:8}}>
           <button className="btn-secondary" onClick={onClose} style={{marginTop:0}}>Cancelar</button>
-          <button className="btn-primary" style={{marginTop:0}} onClick={() => onSave({...appt, notes: note})}>Guardar</button>
+          <button className="btn-primary" style={{marginTop:0}} onClick={() => onSave({...appt,notes:note})}>Guardar</button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// BLOQUEO PARCIAL MODAL
+// ============================================================
+function BloqueoModal({ date, capacidad, blocked, onAdd, onRemove, onClose }) {
+  const [puestos, setPuestos] = useState(1);
+  const [desde, setDesde] = useState(ALL_SLOTS[0]);
+  const [hasta, setHasta] = useState(ALL_SLOTS[ALL_SLOTS.length - 1]);
+
+  const bloqueosDia = blocked.filter(b => b.date === date);
+
+  // Agrupa bloqueos por rango para mostrarlos mejor
+  const resumenPorId = bloqueosDia.reduce((acc, b) => {
+    const key = b.id;
+    if (!acc[key]) acc[key] = b;
+    return acc;
+  }, {});
+
+  const handleAplicar = () => {
+    if (puestos < 1) return;
+    const slots = ALL_SLOTS.filter(t => t >= desde && t <= hasta);
+    if (slots.length === 0) return;
+    onAdd(date, desde, hasta, puestos);
+    onClose();
+  };
+
+  const maxBloqueable = capacidad - 1;
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-sheet" onClick={e => e.stopPropagation()}>
+        <div className="modal-title">🔒 Bloqueo parcial — {formatDateShort(date)}</div>
+
+        <div className="block-panel" style={{margin:"0 0 14px"}}>
+          <div className="block-panel-title">Puestos a bloquear</div>
+          <div className="stepper">
+            <button className="stepper-btn" onClick={() => setPuestos(p => Math.max(1, p-1))}>−</button>
+            <div className="stepper-val">{puestos}</div>
+            <button className="stepper-btn" onClick={() => setPuestos(p => Math.min(maxBloqueable, p+1))}>+</button>
+            <span style={{fontSize:"0.8rem",color:"var(--smoke)"}}>de {capacidad} totales</span>
+          </div>
+        </div>
+
+        <div className="input-group">
+          <label>Desde</label>
+          <select value={desde} onChange={e => setDesde(e.target.value)}>
+            {ALL_SLOTS.map(t => <option key={t} value={t}>{t}</option>)}
+          </select>
+        </div>
+        <div className="input-group">
+          <label>Hasta</label>
+          <select value={hasta} onChange={e => setHasta(e.target.value)}>
+            {ALL_SLOTS.filter(t => t >= desde).map(t => <option key={t} value={t}>{t}</option>)}
+          </select>
+        </div>
+
+        <button className="btn-primary" onClick={handleAplicar} style={{marginTop:4}}>
+          <Icon.ban /> Aplicar bloqueo
+        </button>
+
+        {bloqueosDia.length > 0 && (
+          <>
+            <div style={{fontWeight:700,fontSize:"0.82rem",margin:"16px 0 8px"}}>Bloqueos activos este día</div>
+            <div className="block-list">
+              {Object.values(resumenPorId).map(b => (
+                <div key={b.id} className="block-item">
+                  <div className="block-item-info">
+                    <span className="block-badge">🔒 {b.puestos} puesto{b.puestos>1?"s":""}</span>
+                    <span style={{fontSize:"0.8rem"}}>{b.time}</span>
+                  </div>
+                  <button onClick={() => onRemove(b.id)} style={{background:"none",border:"none",cursor:"pointer",color:"var(--red)",display:"flex",alignItems:"center"}}>
+                    <Icon.x />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        <button className="btn-secondary" onClick={onClose} style={{marginTop:10}}>Cerrar</button>
       </div>
     </div>
   );
@@ -631,7 +667,7 @@ function StatsTab({ appointments }) {
     return d >= start && d <= end;
   });
   const slotCount = {};
-  confirmed.forEach(a => { if(a.time) { const t=a.time.slice(0,5); slotCount[t]=(slotCount[t]||0)+1; } });
+  confirmed.forEach(a => { if(a.time){const t=a.time.slice(0,5);slotCount[t]=(slotCount[t]||0)+1;} });
   const topSlots = Object.entries(slotCount).sort((a,b) => b[1]-a[1]).slice(0,5);
   const maxCount = topSlots[0]?.[1]||1;
   const monthSet = new Set([currentMonthKey]);
@@ -652,83 +688,19 @@ function StatsTab({ appointments }) {
           <div key={s.label} className="stat-card"><div className="stat-val">{s.val}</div><div className="stat-label">{s.label}</div></div>
         ))}
       </div>
-      {topSlots.length>0&&(
-        <>
-          <div className="section-title" style={{marginTop:6}}>Horas más reservadas</div>
-          <div style={{background:"white",borderRadius:13,border:"1.5px solid var(--border)",margin:"0 16px",padding:"14px 16px"}}>
-            {topSlots.map(([time,count])=>(
-              <div key={time} className="popular-row">
-                <span style={{fontWeight:600,minWidth:40,fontSize:"0.85rem"}}>{time}</span>
-                <div className="popular-bar" style={{width:`${(count/maxCount)*110}px`}}/>
-                <span style={{color:"var(--smoke)",fontSize:"0.78rem"}}>{count} cita{count>1?"s":""}</span>
-              </div>
-            ))}
-          </div>
-        </>
-      )}
+      {topSlots.length>0&&(<><div className="section-title" style={{marginTop:6}}>Horas más reservadas</div><div style={{background:"white",borderRadius:13,border:"1.5px solid var(--border)",margin:"0 16px",padding:"14px 16px"}}>{topSlots.map(([time,count])=>(<div key={time} className="popular-row"><span style={{fontWeight:600,minWidth:40,fontSize:"0.85rem"}}>{time}</span><div className="popular-bar" style={{width:`${(count/maxCount)*110}px`}}/><span style={{color:"var(--smoke)",fontSize:"0.78rem"}}>{count} cita{count>1?"s":""}</span></div>))}</div></>)}
       <div className="section-title" style={{marginTop:16}}>📋 Informe mensual</div>
-      <div style={{padding:"0 16px 12px"}}>
-        <div style={{display:"flex",gap:6,overflowX:"auto",paddingBottom:4,scrollbarWidth:"none"}}>
-          {monthKeys.map(key=>(
-            <button key={key} onClick={()=>setSelectedMonthKey(key)} style={{flexShrink:0,padding:"7px 14px",borderRadius:20,border:"1.5px solid",borderColor:selectedMonthKey===key?"var(--ink)":"var(--border)",background:selectedMonthKey===key?"var(--ink)":"white",color:selectedMonthKey===key?"var(--gold)":"var(--smoke)",fontSize:"0.78rem",fontWeight:selectedMonthKey===key?700:400,fontFamily:"'DM Sans',sans-serif",cursor:"pointer",textTransform:"capitalize"}}>
-              {key===currentMonthKey?"Este mes":monthLabel(key)}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10,padding:"0 16px 14px"}}>
-        {[{val:monthConfirmed.length,label:"Completadas",color:"var(--green)"},{val:monthCancelled.length,label:"Canceladas",color:"var(--red)"},{val:monthConfirmed.length,label:"Neto final",color:"var(--gold-dark)"}].map(s=>(
-          <div key={s.label} style={{background:"white",borderRadius:12,padding:"12px 10px",border:"1.5px solid var(--border)",textAlign:"center"}}>
-            <div style={{fontSize:"1.5rem",fontWeight:700,color:s.color,lineHeight:1}}>{s.val}</div>
-            <div style={{fontSize:"0.62rem",color:"var(--smoke)",marginTop:4,textTransform:"uppercase",letterSpacing:"0.05em"}}>{s.label}</div>
-          </div>
-        ))}
-      </div>
-      <div style={{margin:"0 16px 10px",background:"var(--ink)",borderRadius:13,padding:"14px 16px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-        <div>
-          <div style={{color:"var(--gold)",fontWeight:700,fontSize:"0.95rem",textTransform:"capitalize"}}>{monthLabel(selectedMonthKey)}</div>
-          <div style={{color:"#888",fontSize:"0.72rem",marginTop:2}}>{selectedMonthKey===currentMonthKey?"Mes en curso":"Mes cerrado"} · {monthConfirmed.length} confirmada{monthConfirmed.length!==1?"s":""}{monthCancelled.length>0?` · ${monthCancelled.length} cancelada${monthCancelled.length!==1?"s":""}`:""}</div>
-        </div>
-        <div style={{color:"var(--gold)",fontSize:"1.8rem",fontWeight:800,lineHeight:1}}>{monthConfirmed.length}</div>
-      </div>
-      <div style={{padding:"0 16px"}}>
-        {sortedDays.length===0?<div style={{textAlign:"center",padding:"20px 0",color:"var(--smoke)",fontSize:"0.85rem"}}>Sin reservas en {monthLabel(selectedMonthKey)}</div>
-        :sortedDays.map(day=>(
-          <div key={day} style={{marginBottom:10}}>
-            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"6px 0 4px"}}>
-              <span style={{fontSize:"0.72rem",fontWeight:700,textTransform:"capitalize",color:"var(--charcoal)",letterSpacing:"0.04em"}}>{formatDate(day)}</span>
-              <span style={{fontSize:"0.7rem",background:"var(--gold-light)",color:"var(--gold-dark)",borderRadius:10,padding:"2px 8px",fontWeight:700}}>{byDay[day].length} cita{byDay[day].length>1?"s":""}</span>
-            </div>
-            {byDay[day].sort((a,b)=>(a.time||"").localeCompare(b.time||"")).map(appt=>(
-              <div key={appt.id} style={{display:"flex",alignItems:"center",gap:10,background:"white",borderRadius:10,padding:"9px 12px",marginBottom:5,border:"1px solid var(--border)"}}>
-                <span style={{background:"var(--ink)",color:"var(--gold)",borderRadius:7,padding:"4px 8px",fontSize:"0.78rem",fontWeight:700,flexShrink:0}}>{appt.time?appt.time.slice(0,5):""}</span>
-                <div style={{flex:1,minWidth:0}}>
-                  <div style={{fontSize:"0.85rem",fontWeight:600,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{appt.name}</div>
-                  <div style={{fontSize:"0.72rem",color:"var(--smoke)"}}>{appt.phone}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ))}
-      </div>
-      {monthCancelled.length>0&&(
-        <div style={{margin:"10px 16px 0",padding:"11px 14px",background:"#fff8f8",border:"1px solid #fcc",borderRadius:11}}>
-          <div style={{fontSize:"0.75rem",color:"var(--red)",fontWeight:600,marginBottom:6}}>❌ {monthCancelled.length} cancelación{monthCancelled.length>1?"es":""}</div>
-          {monthCancelled.map(appt=>(
-            <div key={appt.id} style={{fontSize:"0.78rem",color:"var(--smoke)",padding:"3px 0",borderTop:"1px solid #fee",display:"flex",gap:8}}>
-              <span style={{color:"#ccc",minWidth:38}}>{appt.time?appt.time.slice(0,5):""}</span>
-              <span style={{textDecoration:"line-through"}}>{appt.name}</span>
-              <span style={{marginLeft:"auto",fontSize:"0.68rem"}}>{formatDateShort(appt.date)}</span>
-            </div>
-          ))}
-        </div>
-      )}
+      <div style={{padding:"0 16px 12px"}}><div style={{display:"flex",gap:6,overflowX:"auto",paddingBottom:4,scrollbarWidth:"none"}}>{monthKeys.map(key=>(<button key={key} onClick={()=>setSelectedMonthKey(key)} style={{flexShrink:0,padding:"7px 14px",borderRadius:20,border:"1.5px solid",borderColor:selectedMonthKey===key?"var(--ink)":"var(--border)",background:selectedMonthKey===key?"var(--ink)":"white",color:selectedMonthKey===key?"var(--gold)":"var(--smoke)",fontSize:"0.78rem",fontWeight:selectedMonthKey===key?700:400,fontFamily:"'DM Sans',sans-serif",cursor:"pointer",textTransform:"capitalize"}}>{key===currentMonthKey?"Este mes":monthLabel(key)}</button>))}</div></div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10,padding:"0 16px 14px"}}>{[{val:monthConfirmed.length,label:"Completadas",color:"var(--green)"},{val:monthCancelled.length,label:"Canceladas",color:"var(--red)"},{val:monthConfirmed.length,label:"Neto final",color:"var(--gold-dark)"}].map(s=>(<div key={s.label} style={{background:"white",borderRadius:12,padding:"12px 10px",border:"1.5px solid var(--border)",textAlign:"center"}}><div style={{fontSize:"1.5rem",fontWeight:700,color:s.color,lineHeight:1}}>{s.val}</div><div style={{fontSize:"0.62rem",color:"var(--smoke)",marginTop:4,textTransform:"uppercase",letterSpacing:"0.05em"}}>{s.label}</div></div>))}</div>
+      <div style={{margin:"0 16px 10px",background:"var(--ink)",borderRadius:13,padding:"14px 16px",display:"flex",alignItems:"center",justifyContent:"space-between"}}><div><div style={{color:"var(--gold)",fontWeight:700,fontSize:"0.95rem",textTransform:"capitalize"}}>{monthLabel(selectedMonthKey)}</div><div style={{color:"#888",fontSize:"0.72rem",marginTop:2}}>{selectedMonthKey===currentMonthKey?"Mes en curso":"Mes cerrado"} · {monthConfirmed.length} confirmada{monthConfirmed.length!==1?"s":""}{monthCancelled.length>0?` · ${monthCancelled.length} cancelada${monthCancelled.length!==1?"s":""}`:""}</div></div><div style={{color:"var(--gold)",fontSize:"1.8rem",fontWeight:800,lineHeight:1}}>{monthConfirmed.length}</div></div>
+      <div style={{padding:"0 16px"}}>{sortedDays.length===0?<div style={{textAlign:"center",padding:"20px 0",color:"var(--smoke)",fontSize:"0.85rem"}}>Sin reservas en {monthLabel(selectedMonthKey)}</div>:sortedDays.map(day=>(<div key={day} style={{marginBottom:10}}><div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"6px 0 4px"}}><span style={{fontSize:"0.72rem",fontWeight:700,textTransform:"capitalize",color:"var(--charcoal)",letterSpacing:"0.04em"}}>{formatDate(day)}</span><span style={{fontSize:"0.7rem",background:"var(--gold-light)",color:"var(--gold-dark)",borderRadius:10,padding:"2px 8px",fontWeight:700}}>{byDay[day].length} cita{byDay[day].length>1?"s":""}</span></div>{byDay[day].sort((a,b)=>(a.time||"").localeCompare(b.time||"")).map(appt=>(<div key={appt.id} style={{display:"flex",alignItems:"center",gap:10,background:"white",borderRadius:10,padding:"9px 12px",marginBottom:5,border:"1px solid var(--border)"}}><span style={{background:"var(--ink)",color:"var(--gold)",borderRadius:7,padding:"4px 8px",fontSize:"0.78rem",fontWeight:700,flexShrink:0}}>{appt.time?appt.time.slice(0,5):""}</span><div style={{flex:1,minWidth:0}}><div style={{fontSize:"0.85rem",fontWeight:600,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{appt.name}</div><div style={{fontSize:"0.72rem",color:"var(--smoke)"}}>{appt.phone}</div></div></div>))}</div>))}</div>
+      {monthCancelled.length>0&&(<div style={{margin:"10px 16px 0",padding:"11px 14px",background:"#fff8f8",border:"1px solid #fcc",borderRadius:11}}><div style={{fontSize:"0.75rem",color:"var(--red)",fontWeight:600,marginBottom:6}}>❌ {monthCancelled.length} cancelación{monthCancelled.length>1?"es":""}</div>{monthCancelled.map(appt=>(<div key={appt.id} style={{fontSize:"0.78rem",color:"var(--smoke)",padding:"3px 0",borderTop:"1px solid #fee",display:"flex",gap:8}}><span style={{color:"#ccc",minWidth:38}}>{appt.time?appt.time.slice(0,5):""}</span><span style={{textDecoration:"line-through"}}>{appt.name}</span><span style={{marginLeft:"auto",fontSize:"0.68rem"}}>{formatDateShort(appt.date)}</span></div>))}</div>)}
     </div>
   );
 }
 
 // ============================================================
-// BIZ SETTINGS TAB
+// BIZ SETTINGS
 // ============================================================
 function BizSettingsTab({ bizConfig, onBizConfig, showToast }) {
   const [form, setForm] = useState({...bizConfig});
@@ -740,18 +712,11 @@ function BizSettingsTab({ bizConfig, onBizConfig, showToast }) {
     setTimeout(() => setSaved(false), 3000);
   };
   const Field = ({ label, field, placeholder, hint }) => (
-    <div className="input-group">
-      <label>{label}</label>
-      <input type="text" placeholder={placeholder} value={form[field]} onChange={e => setForm(f => ({...f,[field]:e.target.value}))} />
-      {hint&&<p style={{fontSize:"0.7rem",color:"var(--smoke)",marginTop:4}}>{hint}</p>}
-    </div>
+    <div className="input-group"><label>{label}</label><input type="text" placeholder={placeholder} value={form[field]} onChange={e => setForm(f => ({...f,[field]:e.target.value}))} />{hint&&<p style={{fontSize:"0.7rem",color:"var(--smoke)",marginTop:4}}>{hint}</p>}</div>
   );
   return (
     <div style={{padding:"16px 16px 36px"}}>
-      <div style={{background:"var(--ink)",borderRadius:16,padding:"16px 18px",marginBottom:16,display:"flex",alignItems:"center",gap:12}}>
-        <div style={{color:"var(--gold)",flexShrink:0}}><Icon.scissors /></div>
-        <div><div style={{color:"var(--gold)",fontWeight:700,fontSize:"0.9rem"}}>Datos del negocio</div><div style={{color:"#888",fontSize:"0.7rem",marginTop:1}}>Visibles para los clientes</div></div>
-      </div>
+      <div style={{background:"var(--ink)",borderRadius:16,padding:"16px 18px",marginBottom:16,display:"flex",alignItems:"center",gap:12}}><div style={{color:"var(--gold)",flexShrink:0}}><Icon.scissors /></div><div><div style={{color:"var(--gold)",fontWeight:700,fontSize:"0.9rem"}}>Datos del negocio</div><div style={{color:"#888",fontSize:"0.7rem",marginTop:1}}>Visibles para los clientes</div></div></div>
       {saved&&<div style={{background:"#f0fff4",border:"1px solid #68d391",borderRadius:10,padding:"10px 14px",marginBottom:14,fontSize:"0.82rem",color:"var(--green)",fontWeight:600}}>✅ Guardado</div>}
       <div style={{background:"white",borderRadius:16,border:"1.5px solid var(--border)",padding:"18px"}}>
         <Field label="Nombre del negocio *" field="name" placeholder="Ej: Barbería Alejandro" hint="Aparece en el encabezado" />
@@ -761,20 +726,13 @@ function BizSettingsTab({ bizConfig, onBizConfig, showToast }) {
         <Field label="Política de cancelación" field="cancelPolicy" placeholder="Ej: Cancelación gratuita con 24h" />
         <button className="btn-primary" onClick={handleSave} disabled={!form.name.trim()} style={{marginTop:8}}><Icon.check /> Guardar configuración</button>
       </div>
-      <div style={{marginTop:14}}>
-        <div className="section-title" style={{padding:"0 0 8px"}}>Vista previa</div>
-        <div className="info-box" style={{margin:0}}>
-          ✂️ <strong>{form.name||"Nombre"}</strong>{form.address?` · ${form.address}`:""}<br />
-          {form.schedule||"Horario"} · Citas de 30 min<br />
-          {form.phone?`📞 ${form.phone} · `:""}{form.cancelPolicy||"Política cancelación"}
-        </div>
-      </div>
+      <div style={{marginTop:14}}><div className="section-title" style={{padding:"0 0 8px"}}>Vista previa</div><div className="info-box" style={{margin:0}}>✂️ <strong>{form.name||"Nombre"}</strong>{form.address?` · ${form.address}`:""}<br />{form.schedule||"Horario"} · Citas de 30 min<br />{form.phone?`📞 ${form.phone} · `:""}{form.cancelPolicy||"Política cancelación"}</div></div>
     </div>
   );
 }
 
 // ============================================================
-// SETTINGS TAB (PASSWORD)
+// SETTINGS TAB
 // ============================================================
 function SettingsTab({ adminPassword, onPasswordChange, showToast }) {
   const [currentPwd, setCurrentPwd] = useState("");
@@ -798,21 +756,12 @@ function SettingsTab({ adminPassword, onPasswordChange, showToast }) {
   return (
     <div style={{padding:"16px 16px 36px"}}>
       <div style={{background:"white",borderRadius:16,border:"1.5px solid var(--border)",overflow:"hidden",marginBottom:16}}>
-        <div style={{background:"var(--ink)",padding:"14px 18px",display:"flex",alignItems:"center",gap:10}}>
-          <span style={{color:"var(--gold)"}}><Icon.lock /></span>
-          <div><div style={{color:"var(--gold)",fontWeight:700,fontSize:"0.9rem"}}>Cambiar contraseña</div><div style={{color:"#888",fontSize:"0.7rem",marginTop:1}}>Solo tú conoces el acceso</div></div>
-        </div>
+        <div style={{background:"var(--ink)",padding:"14px 18px",display:"flex",alignItems:"center",gap:10}}><span style={{color:"var(--gold)"}}><Icon.lock /></span><div><div style={{color:"var(--gold)",fontWeight:700,fontSize:"0.9rem"}}>Cambiar contraseña</div><div style={{color:"#888",fontSize:"0.7rem",marginTop:1}}>Solo tú conoces el acceso</div></div></div>
         <div style={{padding:"18px"}}>
           {success&&<div style={{background:"#f0fff4",border:"1px solid #68d391",borderRadius:10,padding:"10px 14px",marginBottom:14,fontSize:"0.82rem",color:"var(--green)",fontWeight:600}}>✅ Contraseña actualizada</div>}
           {error&&<div style={{background:"#fff5f5",border:"1px solid #fcc",borderRadius:10,padding:"10px 14px",marginBottom:14,fontSize:"0.82rem",color:"var(--red)"}}>⚠️ {error}</div>}
           <div className="input-group"><label>Contraseña actual</label><input type="password" placeholder="Tu contraseña actual" value={currentPwd} onChange={e => setCurrentPwd(e.target.value)} /></div>
-          <div className="input-group">
-            <label>Nueva contraseña</label>
-            <div style={{position:"relative",display:"flex",alignItems:"center"}}>
-              <input type={showNew?"text":"password"} placeholder="Mínimo 6 caracteres" value={newPwd} onChange={e => setNewPwd(e.target.value)} style={{paddingRight:44}} />
-              <button type="button" onClick={() => setShowNew(v=>!v)} style={{position:"absolute",right:14,background:"none",border:"none",cursor:"pointer",color:"var(--smoke)"}}>👁</button>
-            </div>
-          </div>
+          <div className="input-group"><label>Nueva contraseña</label><div style={{position:"relative",display:"flex",alignItems:"center"}}><input type={showNew?"text":"password"} placeholder="Mínimo 6 caracteres" value={newPwd} onChange={e => setNewPwd(e.target.value)} style={{paddingRight:44}} /><button type="button" onClick={() => setShowNew(v=>!v)} style={{position:"absolute",right:14,background:"none",border:"none",cursor:"pointer",color:"var(--smoke)"}}>👁</button></div></div>
           <div className="input-group"><label>Repetir nueva</label><input type="password" placeholder="Repite la contraseña" value={confirmPwd} onChange={e => setConfirmPwd(e.target.value)} style={{borderColor:confirmPwd&&confirmPwd!==newPwd?"var(--red)":confirmPwd&&confirmPwd===newPwd?"var(--green)":undefined}} /></div>
           <button className="btn-primary" onClick={handleChange} disabled={!currentPwd||!newPwd||!confirmPwd} style={{marginTop:4}}><Icon.lock /> Guardar contraseña</button>
         </div>
@@ -825,17 +774,22 @@ function SettingsTab({ adminPassword, onPasswordChange, showToast }) {
 // ============================================================
 // ADMIN PANEL
 // ============================================================
-function AdminPanel({ appointments, blocked, onCancelAppt, onUpdateAppt, onBlock, onUnblock, onBlockDay, onLogout, showToast, adminPassword, onPasswordChange, bizConfig, onBizConfig, capacidad, setCapacidad }) {
+function AdminPanel({ appointments, blocked, onCancelAppt, onUpdateAppt, onBlock, onUnblock, onBlockDay, onBlockParcial, onUnblockParcial, onLogout, showToast, adminPassword, onPasswordChange, bizConfig, onBizConfig, capacidad, setCapacidad }) {
   const [tab, setTab] = useState("agenda");
   const [selectedDate, setSelectedDate] = useState(todayStr());
   const [editModal, setEditModal] = useState(null);
   const [noteModal, setNoteModal] = useState(null);
+  const [bloqueoModal, setBloqueoModal] = useState(false);
   const [search, setSearch] = useState("");
   const days = getNext30Days();
 
   const dateAppts = appointments.filter(a => a.date === selectedDate && a.status === "confirmed").sort((a,b) => (a.time||"").localeCompare(b.time||""));
-  const blockedTimes = blocked.filter(b => b.date === selectedDate).map(b => b.time);
-  const isFullBlocked = blockedTimes.length >= ALL_SLOTS.length;
+  const blockedDia = blocked.filter(b => b.date === selectedDate);
+  const blockedTimesCompletos = ALL_SLOTS.filter(t => {
+    const totalBloqueados = blockedDia.filter(b => b.time === t).reduce((s,b) => s+(b.puestos||1),0);
+    return totalBloqueados >= capacidad;
+  });
+  const isFullBlocked = blockedTimesCompletos.length >= ALL_SLOTS.length;
   const searchResults = search.trim().length > 1 ? appointments.filter(a => a.status==="confirmed"&&(a.name.toLowerCase().includes(search.toLowerCase())||a.phone.includes(search))).sort((a,b) => a.date.localeCompare(b.date)) : [];
   const urgentAppts = appointments.filter(a => { const diff=(new Date(a.date+"T"+(a.time||"00:00"))-new Date())/3600000; return diff>0&&diff<=24&&a.status==="confirmed"; });
 
@@ -853,16 +807,11 @@ function AdminPanel({ appointments, blocked, onCancelAppt, onUpdateAppt, onBlock
 
       {tab==="agenda"&&(
         <div>
-          <div className="search-box">
-            <Icon.search />
-            <input placeholder="Buscar nombre o teléfono..." value={search} onChange={e => setSearch(e.target.value)} />
-            {search&&<button style={{background:"none",border:"none",cursor:"pointer",color:"var(--smoke)",display:"flex"}} onClick={() => setSearch("")}><Icon.x /></button>}
-          </div>
+          <div className="search-box"><Icon.search /><input placeholder="Buscar nombre o teléfono..." value={search} onChange={e => setSearch(e.target.value)} />{search&&<button style={{background:"none",border:"none",cursor:"pointer",color:"var(--smoke)",display:"flex"}} onClick={() => setSearch("")}><Icon.x /></button>}</div>
           {search.trim().length>1?(
             <div style={{padding:"0 16px 20px"}}>
               <div className="section-title" style={{padding:"0 0 8px"}}>{searchResults.length} resultado{searchResults.length!==1?"s":""}</div>
-              {searchResults.length===0?<div className="no-items">Sin resultados</div>
-              :searchResults.map(appt=><ApptCard key={appt.id} appt={appt} showDate onEdit={()=>setEditModal(appt)} onNote={()=>setNoteModal(appt)} onCancel={()=>{onCancelAppt(appt.id);showToast("Cita cancelada");}} />)}
+              {searchResults.length===0?<div className="no-items">Sin resultados</div>:searchResults.map(appt=><ApptCard key={appt.id} appt={appt} showDate onEdit={()=>setEditModal(appt)} onNote={()=>setNoteModal(appt)} onCancel={()=>{onCancelAppt(appt.id);showToast("Cita cancelada");}} />)}
             </div>
           ):(
             <>
@@ -881,8 +830,7 @@ function AdminPanel({ appointments, blocked, onCancelAppt, onUpdateAppt, onBlock
               </div>
               <div className="section-title">{formatDate(selectedDate)} — {dateAppts.length} cita{dateAppts.length!==1?"s":""}</div>
               <div style={{padding:"0 16px 24px"}}>
-                {dateAppts.length===0?<div className="no-items">Sin citas para este día 🎉</div>
-                :dateAppts.map(appt=><ApptCard key={appt.id} appt={appt} onEdit={()=>setEditModal(appt)} onNote={()=>setNoteModal(appt)} onCancel={()=>{onCancelAppt(appt.id);showToast("Cita cancelada");}} />)}
+                {dateAppts.length===0?<div className="no-items">Sin citas para este día 🎉</div>:dateAppts.map(appt=><ApptCard key={appt.id} appt={appt} onEdit={()=>setEditModal(appt)} onNote={()=>setNoteModal(appt)} onCancel={()=>{onCancelAppt(appt.id);showToast("Cita cancelada");}} />)}
               </div>
             </>
           )}
@@ -893,35 +841,81 @@ function AdminPanel({ appointments, blocked, onCancelAppt, onUpdateAppt, onBlock
         <div>
           <div className="calendar-strip" style={{paddingTop:10,paddingBottom:10}}>
             {days.map(d=>{
-              const fb=blocked.filter(b=>b.date===d).length>=ALL_SLOTS.length;
+              const fb=blocked.filter(b=>b.date===d).reduce((s,b)=>s+(b.puestos||1),0) >= ALL_SLOTS.length * capacidad;
               const dateObj=new Date(d+"T12:00:00");
+              const tieneParcial=blocked.some(b=>b.date===d);
               return (
                 <div key={d} className={`day-card ${selectedDate===d?"selected":""}`} onClick={()=>setSelectedDate(d)} style={{width:52}}>
                   <div className="day-name">{dateObj.toLocaleDateString("es-ES",{weekday:"short"})}</div>
                   <div className="day-num">{dateObj.getDate()}</div>
-                  {fb&&<div style={{fontSize:"0.55rem",color:selectedDate===d?"#ff9999":"var(--red)",fontWeight:700}}>CERRADO</div>}
+                  {fb?<div style={{fontSize:"0.55rem",color:selectedDate===d?"#ff9999":"var(--red)",fontWeight:700}}>CERRADO</div>
+                    :tieneParcial?<div style={{fontSize:"0.55rem",color:selectedDate===d?"#ffd080":"#e67e22",fontWeight:700}}>🔒 PARC.</div>
+                    :null}
                 </div>
               );
             })}
           </div>
+
+          {/* Control puestos */}
+          <div style={{padding:"0 16px 10px"}}>
+            <div className="block-panel">
+              <div className="block-panel-title">✂️ Puestos de trabajo simultáneos</div>
+              <div className="stepper">
+                <button className="stepper-btn" onClick={async()=>{if(capacidad>1){const n=capacidad-1;setCapacidad(n);await supabase.from("settings").update({value:String(n)}).eq("key","capacidad");}}} >−</button>
+                <div className="stepper-val">{capacidad}</div>
+                <button className="stepper-btn" onClick={async()=>{const n=capacidad+1;setCapacidad(n);await supabase.from("settings").update({value:String(n)}).eq("key","capacidad");}}>+</button>
+                <span style={{fontSize:"0.8rem",color:"var(--smoke)"}}>reservas por franja</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Bloqueo día completo */}
           <div style={{padding:"0 16px 10px"}}>
             <button className="btn-primary" style={{background:isFullBlocked?"#c0392b":"var(--ink)",color:isFullBlocked?"white":"var(--gold)"}}
               onClick={()=>{if(isFullBlocked){ALL_SLOTS.forEach(t=>onUnblock(selectedDate,t));showToast("Día desbloqueado");}else{onBlockDay(selectedDate);showToast("Día bloqueado");}}}>
               <Icon.ban /> {isFullBlocked?"Desbloquear día completo":"Bloquear día completo"}
             </button>
           </div>
+
+          {/* Bloqueo parcial solo si capacidad > 1 */}
+          {capacidad > 1 && (
+            <div style={{padding:"0 16px 10px"}}>
+              <button className="btn-gold" style={{width:"100%",justifyContent:"center"}} onClick={() => setBloqueoModal(true)}>
+                🔒 Bloquear puestos parcialmente
+              </button>
+            </div>
+          )}
+
+          {/* Grid de franjas */}
           <div className="section-title">Franjas — {formatDateShort(selectedDate)}</div>
-          <div className="info-box" style={{margin:"0 16px 10px"}}>Toca una franja para bloquear o desbloquear.</div>
+          <div className="info-box" style={{margin:"0 16px 10px"}}>
+            {capacidad > 1
+              ? "Naranja = franja con puestos bloqueados parcialmente. Toca para ver detalles."
+              : "Toca una franja para bloquear o desbloquear."}
+          </div>
           <div className="time-grid" style={{padding:"0 16px 24px"}}>
             {ALL_SLOTS.map(t=>{
               const hasAppt=appointments.some(a=>a.date===selectedDate&&a.time&&a.time.slice(0,5)===t&&a.status==="confirmed");
-              const isBlocked=blockedTimes.includes(t);
+              const totalBloqueados=blockedDia.filter(b=>b.time===t).reduce((s,b)=>s+(b.puestos||1),0);
+              const isFullyBlocked=totalBloqueados>=capacidad;
+              const isPartiallyBlocked=totalBloqueados>0&&totalBloqueados<capacidad;
               return (
-                <div key={t} className={`time-slot${hasAppt?" occupied":""}${isBlocked&&!hasAppt?" blocked":""}`} style={{cursor:hasAppt?"not-allowed":"pointer"}}
-                  onClick={()=>{if(hasAppt)return;if(isBlocked){onUnblock(selectedDate,t);showToast(`${t} desbloqueado`);}else{onBlock(selectedDate,t);showToast(`${t} bloqueado`);}}}>
+                <div key={t}
+                  className={`time-slot${hasAppt?" occupied":""}${isFullyBlocked&&!hasAppt?" blocked":""}${isPartiallyBlocked&&!hasAppt?" partial":""}`}
+                  style={{cursor:hasAppt?"not-allowed":"pointer"}}
+                  onClick={()=>{
+                    if(hasAppt)return;
+                    if(capacidad===1){
+                      if(isFullyBlocked){onUnblock(selectedDate,t);showToast(`${t} desbloqueado`);}
+                      else{onBlock(selectedDate,t);showToast(`${t} bloqueado`);}
+                    } else {
+                      setBloqueoModal(true);
+                    }
+                  }}>
                   {t}
                   {hasAppt&&<div style={{fontSize:"0.55rem",marginTop:1}}>Con cita</div>}
-                  {isBlocked&&!hasAppt&&<div style={{fontSize:"0.55rem",marginTop:1}}>Bloqueado</div>}
+                  {isFullyBlocked&&!hasAppt&&<div style={{fontSize:"0.55rem",marginTop:1}}>Bloqueado</div>}
+                  {isPartiallyBlocked&&!hasAppt&&<span className="partial-badge">🔒{totalBloqueados}</span>}
                 </div>
               );
             })}
@@ -934,8 +928,7 @@ function AdminPanel({ appointments, blocked, onCancelAppt, onUpdateAppt, onBlock
       {tab==="alerts"&&(
         <div style={{padding:"16px"}}>
           <div className="info-box" style={{margin:"0 0 14px"}}>⚡ Citas en las <strong>próximas 24 horas</strong></div>
-          {urgentAppts.length===0?<div className="no-items">Sin citas urgentes ✨</div>
-          :urgentAppts.map(appt=>(
+          {urgentAppts.length===0?<div className="no-items">Sin citas urgentes ✨</div>:urgentAppts.map(appt=>(
             <div key={appt.id} className="appt-card" style={{borderLeft:"4px solid var(--gold)"}}>
               <div className="appt-time-badge">{appt.time?appt.time.slice(0,5):""}</div>
               <div className="appt-info"><div className="name">{appt.name}</div><div className="phone">📞 {appt.phone} · {formatDateShort(appt.date)}</div>{appt.email&&<div className="phone">📧 {appt.email}</div>}</div>
@@ -944,27 +937,16 @@ function AdminPanel({ appointments, blocked, onCancelAppt, onUpdateAppt, onBlock
         </div>
       )}
 
-{tab==="availability"&&capacidad&&(
-  <div style={{padding:"0 16px 10px"}}>
-    <div style={{background:"white",borderRadius:13,border:"1.5px solid var(--border)",padding:"14px 16px",marginBottom:10}}>
-      <div style={{fontWeight:700,fontSize:"0.88rem",marginBottom:10}}>Puestos de trabajo simultáneos</div>
-      <div style={{display:"flex",alignItems:"center",gap:12}}>
-        <button onClick={async()=>{if(capacidad>1){const n=capacidad-1;setCapacidad(n);await supabase.from("settings").update({value:String(n)}).eq("key","capacidad");}}} style={{width:36,height:36,borderRadius:8,border:"1.5px solid var(--border)",background:"white",fontSize:"1.2rem",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700}}>−</button>
-        <div style={{fontSize:"1.4rem",fontWeight:700,minWidth:30,textAlign:"center"}}>{capacidad}</div>
-        <button onClick={async()=>{const n=capacidad+1;setCapacidad(n);await supabase.from("settings").update({value:String(n)}).eq("key","capacidad");}} style={{width:36,height:36,borderRadius:8,border:"1.5px solid var(--border)",background:"white",fontSize:"1.2rem",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700}}>+</button>
-        <span style={{fontSize:"0.82rem",color:"var(--smoke)"}}>reservas por franja de 30 min</span>
-      </div>
-    </div>
-  </div>
-)}
       {tab==="biz"&&<BizSettingsTab bizConfig={bizConfig} onBizConfig={onBizConfig} showToast={showToast} />}
       {tab==="settings"&&<SettingsTab adminPassword={adminPassword} onPasswordChange={onPasswordChange} showToast={showToast} />}
 
-      {editModal&&<EditModal appt={editModal} appointments={appointments} blocked={blocked} days={days} onSave={async updated=>{await onUpdateAppt(updated);setEditModal(null);showToast("✅ Cita actualizada");}} onClose={()=>setEditModal(null)} />}
+      {editModal&&<EditModal appt={editModal} appointments={appointments} blocked={blocked} days={days} capacidad={capacidad} onSave={async updated=>{await onUpdateAppt(updated);setEditModal(null);showToast("✅ Cita actualizada");}} onClose={()=>setEditModal(null)} />}
       {noteModal&&<NoteModal appt={noteModal} onSave={async updated=>{await onUpdateAppt(updated);setNoteModal(null);showToast("📝 Nota guardada");}} onClose={()=>setNoteModal(null)} />}
+      {bloqueoModal&&<BloqueoModal date={selectedDate} capacidad={capacidad} blocked={blocked} onAdd={(date,desde,hasta,puestos)=>{onBlockParcial(date,desde,hasta,puestos);showToast("Bloqueo aplicado");}} onRemove={(id)=>{onUnblockParcial(id);showToast("Bloqueo eliminado");}} onClose={()=>setBloqueoModal(false)} />}
     </div>
   );
 }
+
 // ============================================================
 // MAIN APP
 // ============================================================
@@ -977,13 +959,8 @@ export default function App() {
   const [adminAuthed, setAdminAuthed] = useState(false);
   const [toast, setToast] = useState(null);
   const [cancelId, setCancelId] = useState(null);
-
-const [adminPassword, setAdminPassword] = useState(DEFAULT_ADMIN_PASSWORD);
-  const [bizConfig, setBizConfig] = useState({
-    name: BUSINESS_NAME, address: "", phone: "",
-    schedule: "Lunes a Sábado · 09:30 – 21:30",
-    cancelPolicy: "Cancelación gratuita con 24h de antelación"
-  });
+  const [adminPassword, setAdminPassword] = useState(DEFAULT_ADMIN_PASSWORD);
+  const [bizConfig, setBizConfig] = useState({ name: BUSINESS_NAME, address: "", phone: "", schedule: "Lunes a Sábado · 09:30 – 21:30", cancelPolicy: "Cancelación gratuita con 24h de antelación" });
 
   const handlePasswordChange = async (p) => {
     await supabase.from("settings").update({ value: p }).eq("key", "admin_password");
@@ -1010,7 +987,7 @@ const [adminPassword, setAdminPassword] = useState(DEFAULT_ADMIN_PASSWORD);
 
   useEffect(() => { loadData(); }, []);
 
- async function loadData() {
+  async function loadData() {
     setLoading(true);
     const [{ data: appts }, { data: blk }, { data: setts }] = await Promise.all([
       supabase.from("appointments").select("*").order("date").order("time"),
@@ -1023,7 +1000,7 @@ const [adminPassword, setAdminPassword] = useState(DEFAULT_ADMIN_PASSWORD);
       const get = (key, def) => setts.find(s => s.key === key)?.value || def;
       setAdminPassword(get("admin_password", DEFAULT_ADMIN_PASSWORD));
       setCapacidad(parseInt(get("capacidad", "1")));
-	setBizConfig({
+      setBizConfig({
         name: get("biz_name", BUSINESS_NAME),
         address: get("biz_address", ""),
         phone: get("biz_phone", ""),
@@ -1035,7 +1012,7 @@ const [adminPassword, setAdminPassword] = useState(DEFAULT_ADMIN_PASSWORD);
   }
 
   useEffect(() => {
-    const channel = supabase.channel("realtime-appointments")
+    const channel = supabase.channel("realtime-all")
       .on("postgres_changes", { event: "*", schema: "public", table: "appointments" }, () => loadData())
       .on("postgres_changes", { event: "*", schema: "public", table: "blocked_slots" }, () => loadData())
       .subscribe();
@@ -1061,23 +1038,38 @@ const [adminPassword, setAdminPassword] = useState(DEFAULT_ADMIN_PASSWORD);
     setAppointments(prev => prev.map(a => a.id === updated.id ? { ...a, ...updated } : a));
   };
 
+  // Bloqueo total de una franja (capacidad=1)
   const handleBlock = async (date, time) => {
-    const { error } = await supabase.from("blocked_slots").upsert({ date, time }, { onConflict: "date,time" });
-    if (!error) setBlocked(prev => [...prev, { date, time }]);
+    const { data, error } = await supabase.from("blocked_slots").insert({ date, time, puestos: capacidad }).select().single();
+    if (!error) setBlocked(prev => [...prev, { ...data, time: data.time ? data.time.slice(0,5) : data.time }]);
   };
 
+  // Desbloqueo por fecha+hora (para bloqueo completo con capacidad=1)
   const handleUnblock = async (date, time) => {
     await supabase.from("blocked_slots").delete().eq("date", date).eq("time", time);
     setBlocked(prev => prev.filter(b => !(b.date === date && b.time === time)));
   };
 
+  // Bloqueo día completo
   const handleBlockDay = async (date) => {
-    const rows = ALL_SLOTS.map(t => ({ date, time: t }));
-    await supabase.from("blocked_slots").upsert(rows, { onConflict: "date,time" });
-    setBlocked(prev => {
-      const filtered = prev.filter(b => b.date !== date);
-      return [...filtered, ...ALL_SLOTS.map(t => ({ date, time: t }))];
-    });
+    await supabase.from("blocked_slots").delete().eq("date", date);
+    const rows = ALL_SLOTS.map(t => ({ date, time: t, puestos: capacidad }));
+    const { data, error } = await supabase.from("blocked_slots").insert(rows).select();
+    if (!error) setBlocked(prev => [...prev.filter(b => b.date !== date), ...data.map(b => ({ ...b, time: b.time ? b.time.slice(0,5) : b.time }))]);
+  };
+
+  // Bloqueo parcial: añade N puestos en un rango de horas
+  const handleBlockParcial = async (date, desde, hasta, puestos) => {
+    const slots = ALL_SLOTS.filter(t => t >= desde && t <= hasta);
+    const rows = slots.map(t => ({ date, time: t, puestos }));
+    const { data, error } = await supabase.from("blocked_slots").insert(rows).select();
+    if (!error) setBlocked(prev => [...prev, ...data.map(b => ({ ...b, time: b.time ? b.time.slice(0,5) : b.time }))]);
+  };
+
+  // Desbloqueo parcial por ID
+  const handleUnblockParcial = async (id) => {
+    await supabase.from("blocked_slots").delete().eq("id", id);
+    setBlocked(prev => prev.filter(b => b.id !== id));
   };
 
   const isAdmin = route === "admin";
@@ -1088,7 +1080,7 @@ const [adminPassword, setAdminPassword] = useState(DEFAULT_ADMIN_PASSWORD);
       <div className="app-header">
         <div style={{display:"flex",alignItems:"center",gap:10}}>
           <div style={{color:"var(--gold)"}}><Icon.scissors /></div>
-          <div><h1 className="serif">{bizConfig?.name || BUSINESS_NAME}</h1><p>Reserva tu cita · Online</p></div>
+          <div><h1 className="serif">{bizConfig?.name||BUSINESS_NAME}</h1><p>Reserva tu cita · Online</p></div>
         </div>
       </div>
       <div className="loading-screen"><div className="spinner"/><p>Cargando...</p></div>
@@ -1101,7 +1093,7 @@ const [adminPassword, setAdminPassword] = useState(DEFAULT_ADMIN_PASSWORD);
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
           <div style={{display:"flex",alignItems:"center",gap:10}}>
             <div style={{color:"var(--gold)"}}><Icon.scissors /></div>
-            <div><h1 className="serif">{bizConfig?.name || BUSINESS_NAME}</h1><p>Reserva tu cita · Online</p></div>
+            <div><h1 className="serif">{bizConfig?.name||BUSINESS_NAME}</h1><p>Reserva tu cita · Online</p></div>
           </div>
           <div style={{display:"flex",gap:8}}>
             {!isAdmin&&!isCancel&&<button style={{background:"none",border:"1px solid #333",color:"#888",borderRadius:8,padding:"6px 10px",fontSize:"0.7rem",cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}} onClick={()=>setRoute("admin")}>Admin</button>}
@@ -1112,7 +1104,7 @@ const [adminPassword, setAdminPassword] = useState(DEFAULT_ADMIN_PASSWORD);
       <div>
         {route==="home"&&<BookingApp appointments={appointments} blocked={blocked} onBook={handleBook} showToast={showToast} bizConfig={bizConfig} capacidad={capacidad} />}
         {route==="admin"&&!adminAuthed&&<AdminLogin onLogin={()=>setAdminAuthed(true)} adminPassword={adminPassword} onPasswordChange={handlePasswordChange} />}
-        {route==="admin"&&adminAuthed&&<AdminPanel appointments={appointments} blocked={blocked} onCancelAppt={handleCancel} onUpdateAppt={handleUpdate} onBlock={handleBlock} onUnblock={handleUnblock} onBlockDay={handleBlockDay} onLogout={()=>{setAdminAuthed(false);setRoute("home");}} showToast={showToast} adminPassword={adminPassword} onPasswordChange={handlePasswordChange} bizConfig={bizConfig} onBizConfig={handleBizConfig} capacidad={capacidad} setCapacidad={setCapacidad} />}
+        {route==="admin"&&adminAuthed&&<AdminPanel appointments={appointments} blocked={blocked} onCancelAppt={handleCancel} onUpdateAppt={handleUpdate} onBlock={handleBlock} onUnblock={handleUnblock} onBlockDay={handleBlockDay} onBlockParcial={handleBlockParcial} onUnblockParcial={handleUnblockParcial} onLogout={()=>{setAdminAuthed(false);setRoute("home");}} showToast={showToast} adminPassword={adminPassword} onPasswordChange={handlePasswordChange} bizConfig={bizConfig} onBizConfig={handleBizConfig} capacidad={capacidad} setCapacidad={setCapacidad} />}
         {isCancel&&<CancelPage appointmentId={cancelId} onCancel={handleCancel} />}
       </div>
       {toast&&<Toast message={toast} onDone={()=>setToast(null)} />}
