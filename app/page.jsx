@@ -553,7 +553,7 @@ function BloqueoModal({ date, capacidad, blocked, onAdd, onRemove, onClose }) {
     onClose();
   };
 
-  const maxBloqueable = capacidad - 1;
+  const maxBloqueable = capacidad;
 
   return (
     <div className="modal-overlay" onClick={onClose}>
